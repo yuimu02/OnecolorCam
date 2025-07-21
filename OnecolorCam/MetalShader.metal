@@ -66,3 +66,12 @@ inline half3 hsb2rgb(half h, half s, half v)
 
     return half4(rgb.r, rgb.g, rgb.b, c0.a);
 }
+
+//[[ stitchable ]] half4 grayscale
+//(
+// float2 gid, // デフォルト
+// half4 c0 // デフォルト
+// ) {
+//    float gray = c0.r * 0.7 + c0.g * 0.2 + c0.b * 0.1;
+//    return half4(gray, gray, gray, c0.a);
+//}

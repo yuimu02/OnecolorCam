@@ -1,0 +1,24 @@
+{
+  "originHash" : "185e744006f0d272d2b0601d52d0499b214a772a1b3f605760e1d2c27f689b3c",
+  "pins" : [
+    {
+      "identity" : "colorful",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Lakr233/Colorful.git",
+      "state" : {
+        "revision" : "d673ab1b5aaaf2f968fdd73830e318fd4c6910f3",
+        "version" : "1.1.1"
+      }
+    },
+    {
+      "identity" : "simplecamera",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/yukiny0811/SimpleCamera",
+      "state" : {
+        "revision" : "0a24cc42cf1d5217a7d37330049e808a8552f034",
+        "version" : "1.1.1"
+      }
+    }
+  ],
+  "version" : 3
+}
