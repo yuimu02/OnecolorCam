@@ -12,7 +12,10 @@ import AVFoundation
 struct OnecolorCamApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+//            ContentView()
+//            TestCameraView()
+//            PostView()
+            TakePhotoView()
         }
     }
 }

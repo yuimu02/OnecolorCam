@@ -7,8 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		C110D0B42E1E6FC20082FA4B /* SimpleCamera in Frameworks */ = {isa = PBXBuildFile; productRef = C110D0B32E1E6FC20082FA4B /* SimpleCamera */; };
-		C13342E42E2E7EF300B2BCB4 /* Colorful in Frameworks */ = {isa = PBXBuildFile; productRef = C13342E32E2E7EF300B2BCB4 /* Colorful */; };
+		C13342FD2E30E1D200B2BCB4 /* ColorfulX in Frameworks */ = {isa = PBXBuildFile; productRef = C13342FC2E30E1D200B2BCB4 /* ColorfulX */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,8 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C13342E42E2E7EF300B2BCB4 /* Colorful in Frameworks */,
-				C110D0B42E1E6FC20082FA4B /* SimpleCamera in Frameworks */,
+				C13342FD2E30E1D200B2BCB4 /* ColorfulX in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -72,8 +70,7 @@
 			);
 			name = OnecolorCam;
 			packageProductDependencies = (
-				C110D0B32E1E6FC20082FA4B /* SimpleCamera */,
-				C13342E32E2E7EF300B2BCB4 /* Colorful */,
+				C13342FC2E30E1D200B2BCB4 /* ColorfulX */,
 			);
 			productName = OnecolorCam;
 			productReference = C1A781012DC0F9DA00D77FB3 /* OnecolorCam.app */;
@@ -104,8 +101,7 @@
 			mainGroup = C1A780F82DC0F9D900D77FB3;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				C110D0B22E1E6FC20082FA4B /* XCRemoteSwiftPackageReference "SimpleCamera" */,
-				C13342E22E2E7EF300B2BCB4 /* XCRemoteSwiftPackageReference "Colorful" */,
+				C13342FB2E30E1D200B2BCB4 /* XCRemoteSwiftPackageReference "ColorfulX" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = C1A781022DC0F9DA00D77FB3 /* Products */;
@@ -341,34 +337,21 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		C110D0B22E1E6FC20082FA4B /* XCRemoteSwiftPackageReference "SimpleCamera" */ = {
+		C13342FB2E30E1D200B2BCB4 /* XCRemoteSwiftPackageReference "ColorfulX" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/yukiny0811/SimpleCamera";
-			requirement = {
-				kind = exactVersion;
-				version = 1.1.1;
-			};
-		};
-		C13342E22E2E7EF300B2BCB4 /* XCRemoteSwiftPackageReference "Colorful" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Lakr233/Colorful.git";
+			repositoryURL = "https://github.com/Lakr233/ColorfulX.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.1.1;
+				minimumVersion = 5.6.6;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		C110D0B32E1E6FC20082FA4B /* SimpleCamera */ = {
+		C13342FC2E30E1D200B2BCB4 /* ColorfulX */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = C110D0B22E1E6FC20082FA4B /* XCRemoteSwiftPackageReference "SimpleCamera" */;
-			productName = SimpleCamera;
-		};
-		C13342E32E2E7EF300B2BCB4 /* Colorful */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C13342E22E2E7EF300B2BCB4 /* XCRemoteSwiftPackageReference "Colorful" */;
-			productName = Colorful;
+			package = C13342FB2E30E1D200B2BCB4 /* XCRemoteSwiftPackageReference "ColorfulX" */;
+			productName = ColorfulX;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
