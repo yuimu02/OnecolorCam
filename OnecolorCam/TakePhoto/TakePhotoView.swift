@@ -6,13 +6,26 @@
 //
 
 import SwiftUI
+import ColorfulX
 
 struct TakePhotoView: View {
-    
+    @StateObject private var viewModel = HomeViewModel()
     @State var trigger = Trigger()
     
     var body: some View {
+        ZStack {
+            Color.white
+                .ignoresSafeArea()
+            ColorfulView(color: $viewModel.colors)
+                .ignoresSafeArea()
+                .opacity(0.7)
+            
             VStack {
+                Text(viewModel.formattedDate)
+                    .font(.system(size: 20))
+                    .padding()
+                    .foregroundColor(.black)
+                
                 GeometryReader { geometry in
                                 let side = min(geometry.size.width - 40, geometry.size.height)
                                 SimpleCameraView(trigger: $trigger) { uiimage in
@@ -41,4 +54,5 @@ struct TakePhotoView: View {
                 .padding(.top, 33)
         }
     }
+}
 }

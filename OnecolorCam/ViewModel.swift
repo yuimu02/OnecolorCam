@@ -5,30 +5,29 @@
 //  Created by Yuiko Muroyama on 2025/07/23.
 //
 import SwiftUI
+import Foundation
 
 class HomeViewModel: ObservableObject {
     @Published var hueToDisplay: Float = 0.5
     @Published var range: Float = 1.0
-    @Published var color: Color = .red
+//    @Published var color: Color = .red
     @Published var takenPhoto: UIImage? = nil
     @Published var showNextView: Bool = false
-    @Published var colors: [Color] = [Color.blue, Color.purple, Color.white]
-    
-    @Published var dateText: String = ""
-    
-    private let dateFormatter: DateFormatter
+//    @Published var colors: [Color] = [Color.blue, Color.purple, Color.white]
+    @Published var formattedDate: String = ""
+    @Published var colors: [Color] = []
     
     init() {
-        dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "YYYY/MM/dd(E)"
-        dateFormatter.locale = Locale(identifier: "ja_JP")
-        
         updateDate()
+        updateColors(todaysColor: .blue)
     }
     
     func updateDate() {
-        dateText = dateFormatter.string(from: Date())
-    }
+            let formatter = DateFormatter()
+            formatter.locale = Locale(identifier: "en_US_POSIX") // 曜日を英語に
+            formatter.dateFormat = "yyyy.MM.dd.E" // 例: 2025.08.03.Sun
+            formattedDate = formatter.string(from: Date())
+        }
     
     func selectColor(hue: Float, range: Float) {
         self.hueToDisplay = hue
@@ -39,5 +38,30 @@ class HomeViewModel: ObservableObject {
         self.range = 1.0
     }
     
+    
+    func updateColors(todaysColor: Color) {
+        colors = getNearColors(todaysColor: todaysColor)
+    }
+    
+    private func getNearColors(todaysColor: Color) -> [Color] {
+            let todayColorRGB = todaysColor.getRGB()
+            let colorNear1 = Color.white
+            let colorNear2 = Color(
+                red: Double(todayColorRGB.r + Float.random(in: -0.4...0.3)),
+                green: Double(todayColorRGB.g + Float.random(in: -0.4...0.3)),
+                blue: Double(todayColorRGB.b + Float.random(in: -0.2...0.2))
+            )
+            let colorNear3 = Color(
+                red: Double(todayColorRGB.r + Float.random(in: -0.3...0.3)),
+                green: Double(todayColorRGB.g + Float.random(in: -0.3...0.3)),
+                blue: Double(todayColorRGB.b + Float.random(in: -0.3...0.3))
+            )
+            let colorNear4 = Color(
+                red: Double(todayColorRGB.r + Float.random(in: -0.3...0.3)),
+                green: Double(todayColorRGB.g + Float.random(in: -0.3...0.3)),
+                blue: Double(todayColorRGB.b + Float.random(in: -0.3...0.3))
+            )
+            return [todaysColor, colorNear1, colorNear2, colorNear3, colorNear4]
+        }
     
 }

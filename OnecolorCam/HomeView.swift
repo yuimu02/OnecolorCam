@@ -17,11 +17,15 @@ struct HomeView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                ColorfulView(color: $viewModel.colors)
-                    .ignoresSafeArea()
+                Color.white
+//                ColorfulView(color: $viewModel.colors)
+//                    .ignoresSafeArea()
                 
                 VStack {
-                    Text(viewModel.dateText)
+                    Text(viewModel.formattedDate)
+                        .font(.system(size: 20))
+                        .padding()
+                        .foregroundColor(.black)
                     
                     HStack {
                         Button("赤") {
@@ -39,22 +43,22 @@ struct HomeView: View {
                     }
                     .padding()
                     
-                    Image("Sample")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .colorEffect(
-                            Shader(
-                                function: ShaderFunction(
-                                    library: .bundle(.main),
-                                    name: "sample"
-                                ),
-                                arguments: [
-                                    .float(viewModel.hueToDisplay),
-                                    .float(viewModel.range),
-                                    .color(viewModel.color)
-                                ]
-                            )
-                        )
+//                    Image("Sample")
+//                        .resizable()
+//                        .aspectRatio(contentMode: .fit)
+//                        .colorEffect(
+//                            Shader(
+//                                function: ShaderFunction(
+//                                    library: .bundle(.main),
+//                                    name: "sample"
+//                                ),
+//                                arguments: [
+//                                    .float(viewModel.hueToDisplay),
+//                                    .float(viewModel.range),
+//                                    .color(viewModel.color)
+//                                ]
+//                            )
+//                        )
                     
                     Button("trst") {
                         viewModel.showNextView = true
