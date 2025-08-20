@@ -24,8 +24,8 @@ class HomeViewModel: ObservableObject {
     
     func updateDate() {
             let formatter = DateFormatter()
-            formatter.locale = Locale(identifier: "en_US_POSIX") // 曜日を英語に
-            formatter.dateFormat = "yyyy.MM.dd.E" // 例: 2025.08.03.Sun
+            formatter.locale = Locale(identifier: "en_US_POSIX")
+            formatter.dateFormat = "yyyy.MM.dd.E"
             formattedDate = formatter.string(from: Date())
         }
     

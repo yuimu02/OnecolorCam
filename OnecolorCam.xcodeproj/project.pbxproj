@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		C13342FD2E30E1D200B2BCB4 /* ColorfulX in Frameworks */ = {isa = PBXBuildFile; productRef = C13342FC2E30E1D200B2BCB4 /* ColorfulX */; };
+		C1498BDE2E55A4AF00E46AC7 /* AppleSignInFirebase in Frameworks */ = {isa = PBXBuildFile; productRef = C1498BDD2E55A4AF00E46AC7 /* AppleSignInFirebase */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,6 +28,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C1498BDE2E55A4AF00E46AC7 /* AppleSignInFirebase in Frameworks */,
 				C13342FD2E30E1D200B2BCB4 /* ColorfulX in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -71,6 +73,7 @@
 			name = OnecolorCam;
 			packageProductDependencies = (
 				C13342FC2E30E1D200B2BCB4 /* ColorfulX */,
+				C1498BDD2E55A4AF00E46AC7 /* AppleSignInFirebase */,
 			);
 			productName = OnecolorCam;
 			productReference = C1A781012DC0F9DA00D77FB3 /* OnecolorCam.app */;
@@ -102,6 +105,8 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				C13342FB2E30E1D200B2BCB4 /* XCRemoteSwiftPackageReference "ColorfulX" */,
+				C1498BDC2E55A4AF00E46AC7 /* XCRemoteSwiftPackageReference "AppleSignInFirebase" */,
+				C1498BF52E55E3C400E46AC7 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = C1A781022DC0F9DA00D77FB3 /* Products */;
@@ -260,6 +265,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = OnecolorCam/OnecolorCam.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = T3MXB7AQ8F;
@@ -289,6 +295,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = OnecolorCam/OnecolorCam.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = T3MXB7AQ8F;
@@ -345,6 +352,22 @@
 				minimumVersion = 5.6.6;
 			};
 		};
+		C1498BDC2E55A4AF00E46AC7 /* XCRemoteSwiftPackageReference "AppleSignInFirebase" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/yukiny0811/AppleSignInFirebase.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+		C1498BF52E55E3C400E46AC7 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.1.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -352,6 +375,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C13342FB2E30E1D200B2BCB4 /* XCRemoteSwiftPackageReference "ColorfulX" */;
 			productName = ColorfulX;
+		};
+		C1498BDD2E55A4AF00E46AC7 /* AppleSignInFirebase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C1498BDC2E55A4AF00E46AC7 /* XCRemoteSwiftPackageReference "AppleSignInFirebase" */;
+			productName = AppleSignInFirebase;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

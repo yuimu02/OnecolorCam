@@ -7,6 +7,7 @@
 
 import SwiftUI
 import ColorfulX
+import AppleSignInFirebase
 
 struct PostView: View {
     @StateObject private var viewModel = HomeViewModel()
