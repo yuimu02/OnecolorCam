@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		C13342FD2E30E1D200B2BCB4 /* ColorfulX in Frameworks */ = {isa = PBXBuildFile; productRef = C13342FC2E30E1D200B2BCB4 /* ColorfulX */; };
 		C1498BDE2E55A4AF00E46AC7 /* AppleSignInFirebase in Frameworks */ = {isa = PBXBuildFile; productRef = C1498BDD2E55A4AF00E46AC7 /* AppleSignInFirebase */; };
+		C1498BF82E57451D00E46AC7 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = C1498BF72E57451D00E46AC7 /* FirebaseStorage */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +31,7 @@
 			files = (
 				C1498BDE2E55A4AF00E46AC7 /* AppleSignInFirebase in Frameworks */,
 				C13342FD2E30E1D200B2BCB4 /* ColorfulX in Frameworks */,
+				C1498BF82E57451D00E46AC7 /* FirebaseStorage in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -74,6 +76,7 @@
 			packageProductDependencies = (
 				C13342FC2E30E1D200B2BCB4 /* ColorfulX */,
 				C1498BDD2E55A4AF00E46AC7 /* AppleSignInFirebase */,
+				C1498BF72E57451D00E46AC7 /* FirebaseStorage */,
 			);
 			productName = OnecolorCam;
 			productReference = C1A781012DC0F9DA00D77FB3 /* OnecolorCam.app */;
@@ -380,6 +383,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C1498BDC2E55A4AF00E46AC7 /* XCRemoteSwiftPackageReference "AppleSignInFirebase" */;
 			productName = AppleSignInFirebase;
+		};
+		C1498BF72E57451D00E46AC7 /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C1498BF52E55E3C400E46AC7 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
