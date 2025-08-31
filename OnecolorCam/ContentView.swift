@@ -10,7 +10,7 @@ import SwiftUI
 struct ContentView: View {
     
     var body: some View {
-        HomeView()
+        HomeView(year: 2025, month: 8)
     }
 }
 

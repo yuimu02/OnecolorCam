@@ -10,6 +10,7 @@
 		C13342FD2E30E1D200B2BCB4 /* ColorfulX in Frameworks */ = {isa = PBXBuildFile; productRef = C13342FC2E30E1D200B2BCB4 /* ColorfulX */; };
 		C1498BDE2E55A4AF00E46AC7 /* AppleSignInFirebase in Frameworks */ = {isa = PBXBuildFile; productRef = C1498BDD2E55A4AF00E46AC7 /* AppleSignInFirebase */; };
 		C1498BF82E57451D00E46AC7 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = C1498BF72E57451D00E46AC7 /* FirebaseStorage */; };
+		C1AFB7D22E5F153600041053 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = C1AFB7D12E5F153600041053 /* FirebaseFirestore */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +31,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C1498BDE2E55A4AF00E46AC7 /* AppleSignInFirebase in Frameworks */,
+				C1AFB7D22E5F153600041053 /* FirebaseFirestore in Frameworks */,
 				C13342FD2E30E1D200B2BCB4 /* ColorfulX in Frameworks */,
 				C1498BF82E57451D00E46AC7 /* FirebaseStorage in Frameworks */,
 			);
@@ -42,6 +44,7 @@
 			isa = PBXGroup;
 			children = (
 				C1A781032DC0F9DA00D77FB3 /* OnecolorCam */,
+				C1AFB7D02E5F153600041053 /* Frameworks */,
 				C1A781022DC0F9DA00D77FB3 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -52,6 +55,13 @@
 				C1A781012DC0F9DA00D77FB3 /* OnecolorCam.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		C1AFB7D02E5F153600041053 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -77,6 +87,7 @@
 				C13342FC2E30E1D200B2BCB4 /* ColorfulX */,
 				C1498BDD2E55A4AF00E46AC7 /* AppleSignInFirebase */,
 				C1498BF72E57451D00E46AC7 /* FirebaseStorage */,
+				C1AFB7D12E5F153600041053 /* FirebaseFirestore */,
 			);
 			productName = OnecolorCam;
 			productReference = C1A781012DC0F9DA00D77FB3 /* OnecolorCam.app */;
@@ -274,12 +285,14 @@
 				DEVELOPMENT_TEAM = T3MXB7AQ8F;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_NSCameraUsageDescription = "カメラへのアクセスを許可";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -304,12 +317,14 @@
 				DEVELOPMENT_TEAM = T3MXB7AQ8F;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_NSCameraUsageDescription = "カメラへのアクセスを許可";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -388,6 +403,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C1498BF52E55E3C400E46AC7 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseStorage;
+		};
+		C1AFB7D12E5F153600041053 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C1498BF52E55E3C400E46AC7 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -19,7 +19,7 @@ class HomeViewModel: ObservableObject {
     
     init() {
         updateDate()
-        updateColors(todaysColor: .blue)
+        updateColors(todaysColor: colorForToday(date: Date(), uid: "hgursnsnfuesfnfs"))
     }
     
     func updateDate() {
@@ -64,4 +64,21 @@ class HomeViewModel: ObservableObject {
             return [todaysColor, colorNear1, colorNear2, colorNear3, colorNear4]
         }
     
+    struct TabBarButton: View {
+        let iconName: String
+        let destinationView: any View
+        let isDisabled: Bool
+
+        var body: some View {
+            NavigationLink(destination: AnyView(destinationView)) {
+                Image(systemName: iconName)
+                    .font(.title2)
+                    .foregroundColor(.black)
+                    .frame(width: 80, height: 80)
+                    .background(.ultraThinMaterial)
+                    .clipShape(Circle())
+            }
+            .disabled(isDisabled)
+        }
+    }
 }

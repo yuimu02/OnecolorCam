@@ -8,9 +8,11 @@
 import SwiftUI
 import ColorfulX
 
+
 struct TakePhotoView: View {
     @StateObject private var viewModel = HomeViewModel()
     @State var trigger = Trigger()
+    @State private var currentTab: Tab = .camera
     
     var body: some View {
         ZStack {
@@ -52,6 +54,37 @@ struct TakePhotoView: View {
                         .shadow(radius: 3)
                 }
                 .padding(.top, 33)
+                
+                HStack(spacing: 20) {
+                    NavigationLink(destination: HomeView(year: 2025, month: 8)) {
+                            Image(systemName: "house")
+                                .font(.title2)
+                                .foregroundColor(.black)
+                        .frame(width: 80, height: 80)
+                        .background(.ultraThinMaterial) // 半透明効果
+                        .clipShape(Circle())
+                    }
+                    
+                    NavigationLink(destination: TakePhotoView()) {
+                            Image(systemName: "camera.fill")
+                                .font(.title2)
+                                .foregroundColor(.black)
+                        .frame(width: 80, height: 80)
+                        .background(.ultraThinMaterial)
+                        .clipShape(Circle())
+                    }
+                    .disabled(currentTab == .camera)
+                    
+                    NavigationLink(destination: OthersPostsView()) {
+                            Image(systemName: "person.3")
+                                .font(.title2)
+                                .foregroundColor(.black)
+                        .frame(width: 80, height: 80)
+                        .background(.ultraThinMaterial)
+                        .clipShape(Circle())
+                    }
+                }
+                .padding(.bottom, 30)
         }
     }
 }
