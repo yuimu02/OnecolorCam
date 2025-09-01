@@ -15,6 +15,7 @@ import FirebaseFirestore
 struct PostView: View {
     @Environment(AuthManager.self) var authManager
     @StateObject private var viewModel = HomeViewModel()
+    let image: UIImage
     
     var body: some View {
         if authManager.isSignedIn {
@@ -27,10 +28,15 @@ struct PostView: View {
                 
                 VStack {
                     Text("Hello, World!")
-                    Image("Sample")
+//                    Image("Sample")
+//                        .resizable()
+//                        .scaledToFit()
+//                        .frame(width: 200, height: 200)
+                    Image(uiImage: image)
                         .resizable()
                         .scaledToFit()
                         .frame(width: 200, height: 200)
+
                     Button("画像をアップロード") {
                         Task {
                             let uid = AuthManager.shared.user!.uid

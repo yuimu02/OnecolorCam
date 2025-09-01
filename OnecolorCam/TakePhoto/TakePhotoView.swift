@@ -13,6 +13,8 @@ struct TakePhotoView: View {
     @StateObject private var viewModel = HomeViewModel()
     @State var trigger = Trigger()
     @State private var currentTab: Tab = .camera
+    @State private var capturedImage: UIImage? = nil
+    @State private var isShowingPostView = false
     
     var body: some View {
         ZStack {
@@ -30,9 +32,11 @@ struct TakePhotoView: View {
                 
                 GeometryReader { geometry in
                                 let side = min(geometry.size.width - 40, geometry.size.height)
-                                SimpleCameraView(trigger: $trigger) { uiimage in
-                                    print("photo taken")
-                                }
+                    SimpleCameraView(trigger: $trigger) { uiimage in
+                        print("photo taken")
+                        capturedImage = uiimage
+                        isShowingPostView = true
+                    }
                                 .frame(width: side, height: side)
                                 .clipped()
                                 .cornerRadius(12)
@@ -86,6 +90,18 @@ struct TakePhotoView: View {
                 }
                 .padding(.bottom, 30)
         }
+            
+            NavigationLink(
+                destination: {
+                    if let image = capturedImage {
+                        PostView(image: image)
+                    }
+                },
+                isActive: $isShowingPostView
+            ) {
+                EmptyView()
+            }
+            .hidden()
     }
 }
 }
