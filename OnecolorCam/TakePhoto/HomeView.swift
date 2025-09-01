@@ -11,6 +11,7 @@ import SwiftUI
 //import SimpleCamera
 import ColorfulX
 import AppleSignInFirebase
+import FirebaseFirestore
 
 enum Tab {
     case home
@@ -25,7 +26,9 @@ struct HomeView: View {
     @StateObject private var viewModel = HomeViewModel()
     @Environment(AuthManager.self) var authManager
     @State private var currentTab: Tab = .home
-    
+
+    @State var images: [IMagepost] = []
+
     private var days: [Int?] {
             var calendar = Calendar(identifier: .gregorian)
             calendar.firstWeekday = 1 // 日曜始まり
@@ -172,6 +175,9 @@ struct HomeView: View {
                     }
                     .onAppear {
                         viewModel.updateDate()
+                        Task {
+                            try! await loadAllImages()
+                        }
                     }
                     .sheet(
                         isPresented: Binding(
@@ -185,11 +191,19 @@ struct HomeView: View {
                                 .aspectRatio(contentMode: .fit)
                         }
                     }
+                    .refreshable {
+                        Task {
+                            try! await loadAllImages()
+                        }
+                    }
                 }
             }
 //        } else {
 //            SignInWithAppleFirebaseButton()
 //        }
+    func loadAllImages() async throws {
+        // ここに画像をFirestoreから全て読み込むコードを書こう
+    }
     }
 
 struct GlassRect: View {
