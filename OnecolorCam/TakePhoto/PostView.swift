@@ -32,6 +32,7 @@ struct PostView: View {
 //                        .resizable()
 //                        .scaledToFit()
 //                        .frame(width: 200, height: 200)
+                    
                     Image(uiImage: image)
                         .resizable()
                         .scaledToFit()

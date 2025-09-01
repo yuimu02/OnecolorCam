@@ -31,19 +31,19 @@ struct TakePhotoView: View {
                     .foregroundColor(.black)
                 
                 GeometryReader { geometry in
-                                let side = min(geometry.size.width - 40, geometry.size.height)
+                    let side = min(geometry.size.width - 40, geometry.size.height)
                     SimpleCameraView(trigger: $trigger) { uiimage in
                         print("photo taken")
                         capturedImage = uiimage
                         isShowingPostView = true
                     }
-                                .frame(width: side, height: side)
-                                .clipped()
-                                .cornerRadius(12)
-                                .padding(.horizontal, 20)
-                                .padding(.top, 40) // 少し上に余白
-                            }
-                            .aspectRatio(1, contentMode: .fit)
+                    .frame(width: side, height: side)
+                    .clipped()
+                    .cornerRadius(12)
+                    .padding(.horizontal, 20)
+                    .padding(.top, 40) // 少し上に余白
+                }
+                .aspectRatio(1, contentMode: .fit)
                 
                 Button() {
                     trigger.fire()
@@ -61,47 +61,40 @@ struct TakePhotoView: View {
                 
                 HStack(spacing: 20) {
                     NavigationLink(destination: HomeView(year: 2025, month: 8)) {
-                            Image(systemName: "house")
-                                .font(.title2)
-                                .foregroundColor(.black)
-                        .frame(width: 80, height: 80)
-                        .background(.ultraThinMaterial) // 半透明効果
-                        .clipShape(Circle())
+                        Image(systemName: "house")
+                            .font(.title2)
+                            .foregroundColor(.black)
+                            .frame(width: 80, height: 80)
+                            .background(.ultraThinMaterial) // 半透明効果
+                            .clipShape(Circle())
                     }
                     
                     NavigationLink(destination: TakePhotoView()) {
-                            Image(systemName: "camera.fill")
-                                .font(.title2)
-                                .foregroundColor(.black)
-                        .frame(width: 80, height: 80)
-                        .background(.ultraThinMaterial)
-                        .clipShape(Circle())
+                        Image(systemName: "camera.fill")
+                            .font(.title2)
+                            .foregroundColor(.black)
+                            .frame(width: 80, height: 80)
+                            .background(.ultraThinMaterial)
+                            .clipShape(Circle())
                     }
                     .disabled(currentTab == .camera)
                     
                     NavigationLink(destination: OthersPostsView()) {
-                            Image(systemName: "person.3")
-                                .font(.title2)
-                                .foregroundColor(.black)
-                        .frame(width: 80, height: 80)
-                        .background(.ultraThinMaterial)
-                        .clipShape(Circle())
+                        Image(systemName: "person.3")
+                            .font(.title2)
+                            .foregroundColor(.black)
+                            .frame(width: 80, height: 80)
+                            .background(.ultraThinMaterial)
+                            .clipShape(Circle())
                     }
                 }
                 .padding(.bottom, 30)
+                    .navigationDestination(isPresented: $isShowingPostView) {
+                        if let image = capturedImage {
+                            PostView(image: image)
+                        }
+                }
         }
-            
-            NavigationLink(
-                destination: {
-                    if let image = capturedImage {
-                        PostView(image: image)
-                    }
-                },
-                isActive: $isShowingPostView
-            ) {
-                EmptyView()
-            }
-            .hidden()
     }
 }
 }
