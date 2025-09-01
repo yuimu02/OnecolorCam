@@ -40,16 +40,20 @@ struct PostView: View {
 
                     Button("画像をアップロード") {
                         Task {
-                            let uid = AuthManager.shared.user!.uid
-                            guard let image = UIImage(named: "Sample") else {
-                                print("エラー：'Sample'という名前の画像が見つかりません。")
-                                return
-                            }
-                            let newImage = removeAlpha(image)
-                            let imageURL = try! await FirebaseManager.sendImage(image: newImage, folderName: "folder")
-                            print("aaaa", imageURL)
-                            let newPost = IMagepost(URLString: imageURL.absoluteString)
-                            try await FirebaseManager.addItem(item: newPost, uid: uid)
+                            guard let uid = AuthManager.shared.user?.uid else { return }
+                                    
+                                    // 表示中の画像をそのまま加工（アルファを削除）
+                                    let newImage = removeAlpha(image)
+                                    
+                                    do {
+                                        // Firebaseにアップロード
+                                        let imageURL = try await FirebaseManager.sendImage(image: newImage, folderName: "folder")
+                                        print("アップロード成功:", imageURL)
+                                        let newPost = IMagepost(URLString: imageURL.absoluteString)
+                                        try await FirebaseManager.addItem(item: newPost, uid: uid)
+                                    } catch {
+                                        print("アップロード失敗:", error)
+                                    }
                         }
                     }
                 }
