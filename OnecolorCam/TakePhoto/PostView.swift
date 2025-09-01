@@ -43,11 +43,11 @@ struct PostView: View {
                             guard let uid = AuthManager.shared.user?.uid else { return }
                                     
                                     // 表示中の画像をそのまま加工（アルファを削除）
-                                    let newImage = removeAlpha(image)
+//                                    let newImage = removeAlpha(image)
                                     
                                     do {
                                         // Firebaseにアップロード
-                                        let imageURL = try await FirebaseManager.sendImage(image: newImage, folderName: "folder")
+                                        let imageURL = try await FirebaseManager.sendImage(image: image, folderName: "folder")
                                         print("アップロード成功:", imageURL)
                                         let newPost = IMagepost(URLString: imageURL.absoluteString)
                                         try await FirebaseManager.addItem(item: newPost, uid: uid)
