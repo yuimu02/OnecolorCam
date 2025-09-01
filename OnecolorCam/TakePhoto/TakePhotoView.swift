@@ -89,19 +89,12 @@ struct TakePhotoView: View {
                     }
                 }
                 .padding(.bottom, 30)
-        }
-            
-            NavigationLink(
-                destination: {
+                .navigationDestination(isPresented: $isShowingPostView) {
                     if let image = capturedImage {
                         PostView(image: image)
                     }
-                },
-                isActive: $isShowingPostView
-            ) {
-                EmptyView()
-            }
-            .hidden()
+                }
+        }
     }
 }
 }
