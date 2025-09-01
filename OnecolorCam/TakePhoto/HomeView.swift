@@ -11,11 +11,18 @@ import SwiftUI
 //import SimpleCamera
 import ColorfulX
 import AppleSignInFirebase
+import FirebaseFirestore
 
 enum Tab {
     case home
     case others
     case camera
+}
+
+struct ImagePost: Identifiable {
+    var id: String
+    var image: UIImage
+    var created: Date
 }
 
 struct HomeView: View {
@@ -25,6 +32,7 @@ struct HomeView: View {
     @StateObject private var viewModel = HomeViewModel()
     @Environment(AuthManager.self) var authManager
     @State private var currentTab: Tab = .home
+    @State var images: [ImagePost] = []
     
     private var days: [Int?] {
             var calendar = Calendar(identifier: .gregorian)
@@ -70,6 +78,9 @@ struct HomeView: View {
                         .ignoresSafeArea()
                     
                     VStack {
+                        Text("取得した画像数: \(images.count)")
+                               .foregroundColor(.red)
+                               .padding()
                         Text(viewModel.formattedDate)
                             .font(.system(size: 20))
                             .padding()
@@ -172,6 +183,9 @@ struct HomeView: View {
                     }
                     .onAppear {
                         viewModel.updateDate()
+                        Task {
+                            try! await loadAllImages()
+                        }
                     }
                     .sheet(
                         isPresented: Binding(
@@ -185,12 +199,50 @@ struct HomeView: View {
                                 .aspectRatio(contentMode: .fit)
                         }
                     }
+                    .refreshable {
+                        Task {
+                            try! await loadAllImages()
+                        }
+                    }
                 }
             }
+    func loadAllImages() async throws {
+        guard let uid = AuthManager.shared.user?.uid else { return }
+        let db = Firestore.firestore()
+        
+        let snapshot = try await db.collection("users")
+            .document(uid)
+            .collection("posts")
+            .order(by: "created", descending: true)
+            .getDocuments()
+        
+        for document in snapshot.documents {
+            guard let urlString = document["URLString"] as? String,
+                  let url = URL(string: urlString),
+                  let timestamp = document["created"] as? Timestamp else { continue }
+            
+            do {
+                let (data, _) = try await URLSession.shared.data(from: url)
+                if let uiImage = UIImage(data: data) {
+                    images.append(
+                        ImagePost(id: document.documentID, image: uiImage, created: timestamp.dateValue())
+                    )
+                }
+            } catch {
+                print("画像の取得に失敗:", error)
+            }
+        }
+        
+        await MainActor.run {
+            self.images = images
+        }
+    }
+
+    }
 //        } else {
 //            SignInWithAppleFirebaseButton()
 //        }
-    }
+
 
 struct GlassRect: View {
     var body: some View {
