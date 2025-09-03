@@ -51,8 +51,7 @@ inline half3 hsb2rgb(half h, half s, half v)
  float2 gid, // デフォルト
  half4 c0, // デフォルト
  float colorToDisplay,
- float range,
- half4 color
+ float range
  ) {
     half3 hsb = rgb2hsb(c0.r, c0.g, c0.b);
 

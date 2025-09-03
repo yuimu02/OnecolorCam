@@ -1,5 +1,5 @@
 {
-  "originHash" : "96a21e67235aeae0a508e903f9b9c9455bb84f0cae357c5d6823396c97f8fd39",
+  "originHash" : "1cab3273a643fbe88ec683549a1dbaead1cc02cea9ad88b4446c7703c1cb187d",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -152,6 +152,15 @@
       "state" : {
         "revision" : "540318ecedd63d883069ae7f1ed811a2df00b6ac",
         "version" : "2.4.0"
+      }
+    },
+    {
+      "identity" : "renderableview",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/yukiny0811/RenderableView",
+      "state" : {
+        "branch" : "main",
+        "revision" : "df53a756806281b74647d399bac451de350c6ff7"
       }
     },
     {

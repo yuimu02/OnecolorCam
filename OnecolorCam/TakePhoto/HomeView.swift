@@ -1,14 +1,6 @@
-//
-//  HomeView.swift
-//  OnecolorCam
-//
-//  Created by Yuiko Muroyama on 2025/07/23.
-//
-
 // HomeView.swift
 
 import SwiftUI
-//import SimpleCamera
 import ColorfulX
 import AppleSignInFirebase
 import FirebaseFirestore
@@ -19,10 +11,10 @@ enum Tab {
     case camera
 }
 
-struct ImagePost: Identifiable {
-    var id: String
-    var image: UIImage
-    var created: Date
+struct IMagepost: Codable {
+    @DocumentID var id: String?
+    var created:Date = Date()
+    var URLString:String
 }
 
 struct HomeView: View {
@@ -32,227 +24,203 @@ struct HomeView: View {
     @StateObject private var viewModel = HomeViewModel()
     @Environment(AuthManager.self) var authManager
     @State private var currentTab: Tab = .home
-    @State var images: [ImagePost] = []
+    @State var images: [IMagepost] = []
     
     private var days: [Int?] {
-            var calendar = Calendar(identifier: .gregorian)
-            calendar.firstWeekday = 1 // 日曜始まり
-
-            // 指定年月の初日
-            let components = DateComponents(year: year, month: month, day: 1)
-            guard let firstDay = calendar.date(from: components),
-                  let range = calendar.range(of: .day, in: .month, for: firstDay) else {
-                return []
-            }
-
-            let numDays = range.count
-
-            // 初日の曜日 (1=日曜, 2=月曜, … 7=土曜)
-            let weekday = calendar.component(.weekday, from: firstDay)
-
-            // 前の空欄 (weekday-1 個)
-            var result: [Int?] = Array(repeating: nil, count: weekday - 1)
-
-            // 1日から最終日まで
-            result.append(contentsOf: (1...numDays).map { Optional($0) })
-
-            // 42マスに合わせる（7列×6行）
-            while result.count < 42 {
-                result.append(nil)
-            }
-
-            return result
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.firstWeekday = 1 // Start on Sunday
+        
+        let components = DateComponents(year: year, month: month, day: 1)
+        guard let firstDay = calendar.date(from: components),
+              let range = calendar.range(of: .day, in: .month, for: firstDay) else {
+            return []
         }
+        
+        let numDays = range.count
+        let weekday = calendar.component(.weekday, from: firstDay)
+        
+        var result: [Int?] = Array(repeating: nil, count: weekday - 1)
+        result.append(contentsOf: (1...numDays).map { Optional($0) })
+        
+        while result.count < 42 {
+            result.append(nil)
+        }
+        
+        return result
+    }
+    
+    // MARK: - Helper Function to Find Image URL
+    /// Searches the `images` array for a post matching the given day.
+    private func findImageURL(for day: Int) -> String? {
+        let calendar = Calendar.current
+        // Create a target date for the specific day in the current month and year
+        guard let targetDate = calendar.date(from: DateComponents(year: year, month: month, day: day)) else {
+            return nil
+        }
+        
+        // Find the first image where the creation date is on the same day as the target date
+        return images.first { imagePost in
+            calendar.isDate(imagePost.created, inSameDayAs: targetDate)
+        }?.URLString
+    }
     
     var body: some View {
-        
-//        if authManager.isSignedIn {
-            
-//            .buttonStyle(.borderedProminent)
-            
-            
-            NavigationStack {
-                ZStack {
-                    Color.white
-                    ColorfulView(color: $viewModel.colors)
-                        .ignoresSafeArea()
+        NavigationStack {
+            ZStack {
+                Color.white
+                ColorfulView(color: $viewModel.colors)
+                    .ignoresSafeArea()
+                
+                VStack {
+                    Text(viewModel.formattedDate)
+                        .font(.system(size: 20))
+                        .padding()
+                        .foregroundColor(.black)
                     
-                    VStack {
-                        Text("取得した画像数: \(images.count)")
-                               .foregroundColor(.red)
-                               .padding()
-                        Text(viewModel.formattedDate)
-                            .font(.system(size: 20))
-                            .padding()
-                            .foregroundColor(.black)
-                        
-                        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 2) {
-                            ForEach(days.indices, id: \.self) { index in
-                                ZStack {
-                                    GlassRect()
-                                    
-                                    if let day = days[index] {
-                                        if year == 2025 && month == 8 && day == 21 {
-                                            // 指定された日付なら画像を表示
-                                            Image("Sample")
+                    HStack(spacing: 2) {
+                        let weekDays = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]
+                        ForEach(weekDays, id: \.self) { day in
+                            Text(day)
+                                .font(.system(size: 14, weight: .bold))
+                                .foregroundColor(.black)
+                                .frame(maxWidth: .infinity)
+                        }
+                    }
+                    
+                    // MARK: - Modified Calendar Grid
+                    LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 2) {
+                        ForEach(days.indices, id: \.self) { index in
+                            ZStack {
+                                GlassRect()
+                                
+                                if let day = days[index] {
+                                    // Check if an image URL exists for this day
+                                    if let urlString = findImageURL(for: day), let url = URL(string: urlString) {
+                                        // If a URL exists, display the image
+                                        AsyncImage(url: url) { image in
+                                            image
                                                 .resizable()
-                                                .scaledToFit()
-                                                .padding(4)
-                                        } else {
-                                            // それ以外は日付を表示
-                                            Text("\(day)")
-                                                .foregroundColor(.black)
-                                                .font(.system(size: 14, weight: .bold))
+                                                .aspectRatio(1, contentMode: .fit)
+                                                .clipShape(RoundedRectangle(cornerRadius: 4))
+                                                .clipped()
+                                        } placeholder: {
+                                            ProgressView() // Show a loading indicator
                                         }
+                                        .clipped() // Prevents the image from overflowing its frame
+                                        .clipShape(RoundedRectangle(cornerRadius: 4))
+
+                                    } else {
+                                        // If no image, display the day number
+                                        Text("\(day)")
+                                            .foregroundColor(.black)
+                                            .font(.system(size: 14, weight: .bold))
                                     }
                                 }
-                                .frame(height: 55) // マスの大きさ
                             }
+                            .padding(.vertical, 3)
                         }
-                        Spacer()
-                        
-                        // 半透明の白っぽい背景にしたボタンを横に並べる
-                        HStack(spacing: 20) {
-                            NavigationLink(destination: HomeView(year: 2025, month: 8)) {
-                                    Image(systemName: "house.fill")
-                                        .font(.title2)
-                                        .foregroundColor(.black)
+                    }
+                    Spacer()
+                    
+                    // Bottom navigation buttons
+                    HStack(spacing: 34) {
+                        NavigationLink(destination: HomeView(year: 2025, month: 8)) {
+                            Image(systemName: "house.fill")
+                                .font(.system(size: 30))
+                                .foregroundColor(.black)
                                 .frame(width: 80, height: 80)
-                                .background(.ultraThinMaterial) // 半透明効果
-                                .clipShape(Circle())
-                            }
-                            .disabled(currentTab == .home)
-                            
-                            NavigationLink(destination: TakePhotoView()) {
-                                    Image(systemName: "camera")
-                                        .font(.title2)
-                                        .foregroundColor(.black)
+                                .background(
+                                    Circle()
+                                        .fill(Color.white.opacity(0.3))
+                                        .shadow(color: .black.opacity(0.7), radius: 4, x: 0, y: 2)
+                                )
+                                .overlay(
+                                    Circle()
+                                        .stroke(Color.black, lineWidth: 1.7)
+                                )
+                        }
+                        .offset(y: -10)
+                        .disabled(currentTab == .home)
+                        
+                        NavigationLink(destination: TakePhotoView()) {
+                            Image(systemName: "camera")
+                                .font(.system(size: 30))
+                                .foregroundColor(.black)
                                 .frame(width: 80, height: 80)
-                                .background(.ultraThinMaterial)
-                                .clipShape(Circle())
-                            }
-                            
-                            NavigationLink(destination: OthersPostsView()) {
-                                    Image(systemName: "person.3")
-                                        .font(.title2)
-                                        .foregroundColor(.black)
+                                .background(
+                                    Circle()
+                                        .fill(Color.white.opacity(0.3))
+                                        .shadow(color: .black.opacity(0.7), radius: 4, x: 0, y: 2)
+                                )
+                                .overlay(
+                                    Circle()
+                                        .stroke(Color.black, lineWidth: 0.8)
+                                )
+                        }
+                        .offset(y: 10)
+                        
+                        NavigationLink(destination: OthersPostsView()) {
+                            Image(systemName: "person.3")
+                                .font(.system(size: 25))
+                                .foregroundColor(.black)
                                 .frame(width: 80, height: 80)
-                                .background(.ultraThinMaterial)
-                                .clipShape(Circle())
-                            }
+                                .background(
+                                    Circle()
+                                        .fill(Color.white.opacity(0.3))
+                                        .shadow(color: .black.opacity(0.7), radius: 4, x: 0, y: 2)
+                                )
+                                .overlay(
+                                    Circle()
+                                        .stroke(Color.black, lineWidth: 0.8)
+                                )
                         }
-                        .padding(.bottom, 30)
-                               }
-                        
-//                        HStack {
-//                            Button("赤") {
-//                                viewModel.selectColor(hue: 0.99, range: 0.1)
-//                            }
-//                            Button("緑") {
-//                                viewModel.selectColor(hue: 0.33, range: 0.13)
-//                            }
-//                            Button("青") {
-//                                viewModel.selectColor(hue: 0.66, range: 0.08)
-//                            }
-//                            Button("元に戻す") {
-//                                viewModel.resetColorRange()
-//                            }
-//                        }
-                        .padding()
-                        
-                        //                    Image("Sample")
-                        //                        .resizable()
-                        //                        .aspectRatio(contentMode: .fit)
-                        //                        .colorEffect(
-                        //                            Shader(
-                        //                                function: ShaderFunction(
-                        //                                    library: .bundle(.main),
-                        //                                    name: "sample"
-                        //                                ),
-                        //                                arguments: [
-                        //                                    .float(viewModel.hueToDisplay),
-                        //                                    .float(viewModel.range),
-                        //                                    .color(viewModel.color)
-                        //                                ]
-                        //                            )
-                        //                        )
-                        
-//                        Button("trst") {
-//                            viewModel.showNextView = true
-//                        }
+                        .offset(y: -10)
                     }
-                    .onAppear {
-                        viewModel.updateDate()
-                        Task {
-                            try! await loadAllImages()
-                        }
-                    }
-                    .sheet(
-                        isPresented: Binding(
-                            get: { viewModel.takenPhoto != nil },
-                            set: { _ in viewModel.takenPhoto = nil }
-                        )
-                    ) {
-                        if let image = viewModel.takenPhoto {
-                            Image(uiImage: image)
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                        }
-                    }
-                    .refreshable {
-                        Task {
-                            try! await loadAllImages()
-                        }
-                    }
+                    .padding(.bottom, 30)
+                }
+                .padding()
+            }
+            .onAppear {
+                viewModel.updateDate()
+                Task {
+                    try? await loadAllImages()
                 }
             }
+            .sheet(
+                isPresented: Binding(
+                    get: { viewModel.takenPhoto != nil },
+                    set: { _ in viewModel.takenPhoto = nil }
+                )
+            ) {
+                if let image = viewModel.takenPhoto {
+                    Image(uiImage: image)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                }
+            }
+            .refreshable {
+                Task {
+                    try? await loadAllImages()
+                }
+            }
+        }
+    }
+    
     func loadAllImages() async throws {
+        // Ensure user is not nil before fetching
         guard let uid = AuthManager.shared.user?.uid else { return }
-        let db = Firestore.firestore()
-        
-        let snapshot = try await db.collection("users")
-            .document(uid)
-            .collection("posts")
-            .order(by: "created", descending: true)
-            .getDocuments()
-        
-        for document in snapshot.documents {
-            guard let urlString = document["URLString"] as? String,
-                  let url = URL(string: urlString),
-                  let timestamp = document["created"] as? Timestamp else { continue }
-            
-            do {
-                let (data, _) = try await URLSession.shared.data(from: url)
-                if let uiImage = UIImage(data: data) {
-                    images.append(
-                        ImagePost(id: document.documentID, image: uiImage, created: timestamp.dateValue())
-                    )
-                }
-            } catch {
-                print("画像の取得に失敗:", error)
-            }
-        }
-        
-        await MainActor.run {
-            self.images = images
-        }
+        self.images = try await FirebaseManager.getAllItems(uid: uid)
     }
-
-    }
-//        } else {
-//            SignInWithAppleFirebaseButton()
-//        }
-
+}
 
 struct GlassRect: View {
     var body: some View {
         RoundedRectangle(cornerRadius: 6)
             .fill(.ultraThinMaterial)
-            .aspectRatio(1, contentMode: .fit)
+            .aspectRatio(1, contentMode: .fit) // This helps ensure the cell is a square
     }
 }
 
 #Preview {
     HomeView(year: 2025, month: 8)
 }
-

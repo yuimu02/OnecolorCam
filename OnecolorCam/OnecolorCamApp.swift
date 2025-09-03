@@ -27,7 +27,7 @@ struct OnecolorCamApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            AuthView()
 //            TestCameraView()
 //            PostView()
 //            TakePhotoView()

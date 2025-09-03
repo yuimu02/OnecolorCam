@@ -11,11 +11,18 @@ import AppleSignInFirebase
 import Firebase
 import FirebaseStorage
 import FirebaseFirestore
+import RenderableView
 
 struct PostView: View {
     @Environment(AuthManager.self) var authManager
     @StateObject private var viewModel = HomeViewModel()
-    let image: UIImage
+    @State var image: UIImage
+    @State var updateCounter = 0
+    
+    
+    init(image: UIImage) {
+        self._image = .init(initialValue: image)
+    }
     
     var body: some View {
         if authManager.isSignedIn {
@@ -28,17 +35,28 @@ struct PostView: View {
                 
                 VStack {
                     Text("Hello, World!")
-//                    Image("Sample")
-//                        .resizable()
-//                        .scaledToFit()
-//                        .frame(width: 200, height: 200)
                     
-                    Image(uiImage: image)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 200, height: 200)
-
-                    Button("画像をアップロード") {
+                    
+                    
+                    Renderable(trigger: $updateCounter) {
+                        Image(uiImage: image)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 300, height: 300)
+                            .colorEffect(
+                                Shader(
+                                    function: ShaderFunction(
+                                        library: .bundle(.main),
+                                        name: "sample"
+                                    ),
+                                    arguments: [
+                                        .float(getTodayHue()),
+                                        .float(0.2),
+                                    ]
+                                )
+                            )
+                    } onTrigger: { data in
+                        self.image = UIImage(data: data!)!
                         Task {
                             guard let uid = AuthManager.shared.user?.uid else { return }
                                     
@@ -56,64 +74,63 @@ struct PostView: View {
                                     }
                         }
                     }
+
+                    Button("画像をアップロード") {
+                        updateCounter += 1
+                    }
                 }
             }
         } else {
             SignInWithAppleFirebaseButton()
         }
     }
-//    func UploadImage() {
-//        let storageref = Storage.storage().reference(forURL: "gs://onecolorcam.firebasestorage.app").child("Item")
-//        
-//        // オプショナルバインディングで安全に画像を読み込む
-//        guard let image = UIImage(named: "Sample") else {
-//            print("エラー：'Sample'という名前の画像が見つかりません。")
-//            return
-//        }
-//        
-//        // 画像のアルファチャンネル（透明度）を削除して、新しいUIImageを作成する
-//        let newImage = removeAlpha(image)
-//        
-//        // jpegDataへの変換を再度試す
-//        guard let data = newImage.jpegData(compressionQuality: 1.0) else {
-//            print("エラー：jpegDataへの変換に失敗しました。")
-//            return
-//        }
-//        
-//        let nsData = data as NSData
-//        
-//        storageref.putData(data, metadata: nil) { (data, error) in
-//            if let error = error {
-//                print("エラー：画像のアップロードに失敗しました。\(error.localizedDescription)")
-//                return
-//            }
-//            print("画像が正常にアップロードされました。")
-//        }
-//    }
-
-    // UIImageのアルファチャンネルを削除するヘルパー関数
+    func getTodayHue() -> Float {
+            guard let uid = AuthManager.shared.user?.uid else { return 0.0 }
+            let todaysColor = colorForToday(date: Date(), uid: uid)
+            let hsv = todaysColor.toHSV()
+            return hsv.h
+        }
     func removeAlpha(_ image: UIImage) -> UIImage {
         let format = UIGraphicsImageRendererFormat()
-        format.scale = image.scale // 元の画像のスケールを維持
-        format.opaque = true // 不透明に設定
+        format.scale = image.scale
+        format.opaque = true
         
         let renderer = UIGraphicsImageRenderer(size: image.size, format: format)
-        
-        let newImage = renderer.image { context in
+        return renderer.image { context in
             image.draw(at: .zero)
             context.cgContext.setFillColor(UIColor.white.cgColor)
             context.cgContext.fill(CGRect(origin: .zero, size: image.size))
         }
-        return newImage
+    }
+    // UIImageのアルファチャンネルを削除するヘルパー関数
+
+}
+
+extension Color {
+    func toHSV() -> (h: Float, s: Float, v: Float) {
+        var r: CGFloat = 0
+        var g: CGFloat = 0
+        var b: CGFloat = 0
+        UIColor(self).getRed(&r, green: &g, blue: &b, alpha: nil)
+        let maxc = max(r, g, b)
+        let minc = min(r, g, b)
+        let delta = maxc - minc
+        
+        var h: Float = 0
+        if delta > 0.00001 {
+            if maxc == r { h = fmodf(Float((g - b)/delta), 6) }
+            else if maxc == g { h = Float((b - r)/delta) + 2 }
+            else { h = Float((r - g)/delta) + 4 }
+            h /= 6
+            if h < 0 { h += 1 }
+        }
+        let s: Float = maxc == 0 ? 0 : Float(delta / maxc)
+        let v: Float = Float(maxc)
+        return (h, s, v)
     }
 }
 
+
 #Preview {
     ContentView()
-}
-
-struct IMagepost: Codable {
-    @DocumentID var id: String?
-    var created:Date = Date()
-    var URLString:String
 }
