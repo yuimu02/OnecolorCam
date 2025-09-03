@@ -8,43 +8,33 @@
 import SwiftUI
 import ColorfulX
 
-extension UIImage {
-    func croppedToSquare() -> UIImage {
-        // 画像の向きを固定
-        let normalized = self.fixedOrientation()
-        
-        let originalWidth = normalized.size.width
-        let originalHeight = normalized.size.height
-        
-        // 正方形の辺の長さは短い方
-        let squareLength = min(originalWidth, originalHeight)
-        
-        // 中央の開始座標を計算
-        let x = (originalWidth - squareLength) / 2.0
-        let y = (originalHeight - squareLength) / 2.0
-        let cropRect = CGRect(x: x, y: y, width: squareLength, height: squareLength)
-        
-        // クロップ実行
-        guard let cgImage = normalized.cgImage?.cropping(to: cropRect) else {
-            print("crop err")
-            return normalized
+    extension UIImage {
+        func croppedToSquare() -> UIImage {
+            let src = self.fixedOrientation()
+            let w = src.size.width, h = src.size.height
+            let side = min(w, h)
+//            let x = (w - side) / 2.0
+//            let y = (h - side) / 2.0
+            let x: CGFloat = 0
+            let y: CGFloat = 0
+
+            let format = UIGraphicsImageRendererFormat.default()
+            format.scale = src.scale   // 解像度維持
+            let renderer = UIGraphicsImageRenderer(size: CGSize(width: side, height: side), format: format)
+
+            return renderer.image { _ in
+                src.draw(in: CGRect(x: -x, y: -y, width: w, height: h))
+            }
         }
-        
-        return UIImage(cgImage: cgImage)
+        func fixedOrientation() -> UIImage {
+            if imageOrientation == .up { return self }
+            UIGraphicsBeginImageContextWithOptions(size, false, scale)
+            draw(in: CGRect(origin: .zero, size: size))
+            let img = UIGraphicsGetImageFromCurrentImageContext()
+            UIGraphicsEndImageContext()
+            return img ?? self
+        }
     }
-    
-    // 向きを固定する helper
-    func fixedOrientation() -> UIImage {
-        if imageOrientation == .up { return self }
-        
-        UIGraphicsBeginImageContextWithOptions(size, false, scale)
-        draw(in: CGRect(origin: .zero, size: size))
-        let normalizedImage = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        
-        return normalizedImage ?? self
-    }
-}
 
 struct TakePhotoView: View {
     @StateObject private var viewModel = HomeViewModel()
@@ -75,6 +65,7 @@ struct TakePhotoView: View {
                         isShowingPostView = true
                     }
                     .frame(width: side, height: side)
+                    .scaledToFill()
                     .clipped()
                     .cornerRadius(12)
                     .padding(.horizontal, 20)

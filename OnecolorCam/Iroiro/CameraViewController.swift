@@ -38,6 +38,7 @@ public class CameraViewController: UIViewController, AVCapturePhotoCaptureDelega
                 previewlayer = AVCaptureVideoPreviewLayer(session: capturesession)
                 previewlayer.frame = view.bounds
                 previewlayer.videoGravity = .resizeAspectFill
+                previewlayer.connection?.videoOrientation = .portrait
                 view.layer.addSublayer(previewlayer)
                 Task.detached {
                     await self.capturesession.startRunning()
@@ -50,6 +51,7 @@ public class CameraViewController: UIViewController, AVCapturePhotoCaptureDelega
 
     public func takePhoto() {
         let settings = AVCapturePhotoSettings()
+        settings
         cameraoutput.capturePhoto(with: settings, delegate: self)
     }
 
