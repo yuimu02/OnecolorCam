@@ -26,8 +26,9 @@ struct HomeView: View {
     @Environment(AuthManager.self) var authManager
     @State private var currentTab: Tab = .home
     @State var images: [IMagepost] = []
-    @State private var isShowingDetailSheet = false
-    @State private var selectedImagePost: IMagepost?
+    @State private var isShowingPager = false
+    @State private var postsForSelectedDay: [IMagepost] = []
+    @State private var startIndex: Int = 0
     
     
     private var days: [Int?] {
@@ -55,17 +56,16 @@ struct HomeView: View {
     
     // MARK: - Helper Function to Find Image URL
     /// Searches the `images` array for a post matching the given day.
-    private func findImagePost(for day: Int) -> IMagepost? {
+    private func findImagePost(for day: Int) -> [IMagepost] {
         let calendar = Calendar.current
         // Create a target date for the specific day in the current month and year
         guard let targetDate = calendar.date(from: DateComponents(year: year, month: month, day: day)) else {
-            return nil
+            return []
         }
         
-        // Find the first image where the creation date is on the same day as the target date
-        return images.first { imagePost in
-            calendar.isDate(imagePost.created, inSameDayAs: targetDate)
-        }
+        return images
+            .filter { calendar.isDate($0.created, inSameDayAs: targetDate) }
+            .sorted { $0.created < $1.created }
     }
     
     var body: some View {
@@ -98,7 +98,8 @@ struct HomeView: View {
                                 GlassRect()
                                 
                                 if let day = days[index] {
-                                    if let imagePost = findImagePost(for: day), let url = URL(string: imagePost.URLString) {
+                                    let posts = findImagePost(for: day)
+                                    if let first = posts.first, let url = URL(string: first.URLString) {
                                         // If a URL exists, display the image
                                         AsyncImage(url: url) { image in
                                             image
@@ -107,8 +108,9 @@ struct HomeView: View {
                                                 .clipShape(RoundedRectangle(cornerRadius: 4))
                                                 .clipped()
                                                 .onTapGesture {
-                                                    self.selectedImagePost = imagePost
-                                                    self.isShowingDetailSheet = true
+                                                    postsForSelectedDay = posts
+                                                    startIndex = 0
+                                                    isShowingPager = true
                                                 }
                                         } placeholder: {
                                             ProgressView() // Show a loading indicator
@@ -193,10 +195,8 @@ struct HomeView: View {
                     try? await loadAllImages()
                 }
             }
-            .sheet(isPresented: $isShowingDetailSheet) {
-                if let post = selectedImagePost {
-                    ImageDetailSheet(imageURL: post.URLString, date: post.created)
-                }
+            .sheet(isPresented: $isShowingPager) {
+                ImageDetailPagerSheet(posts: postsForSelectedDay, index: startIndex)
             }
             .refreshable {
                 Task {
@@ -213,48 +213,51 @@ struct HomeView: View {
     }
 }
 
-struct ImageDetailSheet: View {
+struct ImageDetailPagerSheet: View {
     @StateObject private var viewModel = HomeViewModel()
-    @Environment(\.dismiss) var dismiss
-    let imageURL: String?
-    let date: Date?
+    let posts: [IMagepost]
+    @State var index: Int   // 開始位置
 
-//    var formattedDate: String {
-//        guard let date = date else { return "" }
-//        let formatter = DateFormatter()
-//        formatter.dateStyle = .long
-//        formatter.timeStyle = .none
-//        formatter.locale = Locale.current
-//        return formatter.string(from: date)
-//    }
+    private let df: DateFormatter = {
+        let f = DateFormatter()
+        f.dateStyle = .long
+        f.timeStyle = .none
+        f.locale = .current
+        return f
+    }()
 
     var body: some View {
-        VStack(spacing: 20) {
-            HStack {
-                Spacer()
-            }
+        VStack(spacing: 0) {
 
-            if let urlString = imageURL, let url = URL(string: urlString) {
-                AsyncImage(url: url) { image in
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(maxWidth: .infinity)
-                        .cornerRadius(12)
-                        .shadow(radius: 10)
-                } placeholder: {
-                    ProgressView()
+            TabView(selection: $index) {
+                ForEach(posts.indices, id: \.self) { i in
+                    VStack(spacing: 16) {
+                        if let url = URL(string: posts[i].URLString) {
+                            AsyncImage(url: url) { image in
+                                image
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(maxWidth: .infinity)
+                                    .cornerRadius(12)
+                                    .shadow(radius: 10)
+                            } placeholder: {
+                                ProgressView()
+                            }
+                        } else {
+                            Text("画像がありません")
+                        }
+
+                        Text(viewModel.formattedDate)
+                            .font(.title3).bold()
+                            .padding(.vertical,30)
+                    }
+                    .padding(.horizontal)
+                    .tag(i)
                 }
-            } else {
-                Text("画像がありません")
             }
-
-            Text(viewModel.formattedDate)
-                .font(.title2)
-                .fontWeight(.bold)
-                .padding(.top, 30)
+            .tabViewStyle(.page)
+            .indexViewStyle(.page(backgroundDisplayMode: .interactive))
         }
-        .padding()
     }
 }
 

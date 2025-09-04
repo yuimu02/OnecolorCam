@@ -39,6 +39,7 @@ enum FirebaseManager {
         print(uid)
         try db.collection("publicPhotos").addDocument(from: item)
     }
+    
 
     static func deleteItem(id: String, uid: String) throws {
         try db.collection("users").document(uid).collection("posts").document(id).delete()
