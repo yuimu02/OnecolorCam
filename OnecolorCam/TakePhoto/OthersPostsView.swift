@@ -14,6 +14,7 @@ struct OthersPostsView: View {
     var body: some View {
         VStack {
             Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+            
             HStack(spacing: 34) {
                 NavigationLink(destination: HomeView(year: 2025, month: 8)) {
                         Image(systemName: "house")

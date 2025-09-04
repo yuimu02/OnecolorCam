@@ -34,6 +34,11 @@ enum FirebaseManager {
         print(uid)
         try db.collection("users").document(uid).collection("posts").addDocument(from: item)
     }
+    
+    static func addPublicItem(item: IMagepost, uid: String) throws {
+        print(uid)
+        try db.collection("publicPhotos").addDocument(from: item)
+    }
 
     static func deleteItem(id: String, uid: String) throws {
         try db.collection("users").document(uid).collection("posts").document(id).delete()
@@ -50,4 +55,5 @@ enum FirebaseManager {
     static func getAllItems(uid: String) async throws -> [IMagepost] {
         return try await db.collection("users").document(uid).collection("posts").getDocuments().documents.map { try $0.data(as: IMagepost.self) }
     }
+    
 }

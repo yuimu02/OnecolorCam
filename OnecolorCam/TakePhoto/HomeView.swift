@@ -15,6 +15,7 @@ struct IMagepost: Codable {
     @DocumentID var id: String?
     var created:Date = Date()
     var URLString:String
+//    var color: String
 }
 
 struct HomeView: View {
@@ -25,6 +26,9 @@ struct HomeView: View {
     @Environment(AuthManager.self) var authManager
     @State private var currentTab: Tab = .home
     @State var images: [IMagepost] = []
+    @State private var isShowingDetailSheet = false
+    @State private var selectedImagePost: IMagepost?
+    
     
     private var days: [Int?] {
         var calendar = Calendar(identifier: .gregorian)
@@ -51,7 +55,7 @@ struct HomeView: View {
     
     // MARK: - Helper Function to Find Image URL
     /// Searches the `images` array for a post matching the given day.
-    private func findImageURL(for day: Int) -> String? {
+    private func findImagePost(for day: Int) -> IMagepost? {
         let calendar = Calendar.current
         // Create a target date for the specific day in the current month and year
         guard let targetDate = calendar.date(from: DateComponents(year: year, month: month, day: day)) else {
@@ -61,7 +65,7 @@ struct HomeView: View {
         // Find the first image where the creation date is on the same day as the target date
         return images.first { imagePost in
             calendar.isDate(imagePost.created, inSameDayAs: targetDate)
-        }?.URLString
+        }
     }
     
     var body: some View {
@@ -94,8 +98,7 @@ struct HomeView: View {
                                 GlassRect()
                                 
                                 if let day = days[index] {
-                                    // Check if an image URL exists for this day
-                                    if let urlString = findImageURL(for: day), let url = URL(string: urlString) {
+                                    if let imagePost = findImagePost(for: day), let url = URL(string: imagePost.URLString) {
                                         // If a URL exists, display the image
                                         AsyncImage(url: url) { image in
                                             image
@@ -103,6 +106,10 @@ struct HomeView: View {
                                                 .aspectRatio(1, contentMode: .fit)
                                                 .clipShape(RoundedRectangle(cornerRadius: 4))
                                                 .clipped()
+                                                .onTapGesture {
+                                                    self.selectedImagePost = imagePost
+                                                    self.isShowingDetailSheet = true
+                                                }
                                         } placeholder: {
                                             ProgressView() // Show a loading indicator
                                         }
@@ -186,16 +193,9 @@ struct HomeView: View {
                     try? await loadAllImages()
                 }
             }
-            .sheet(
-                isPresented: Binding(
-                    get: { viewModel.takenPhoto != nil },
-                    set: { _ in viewModel.takenPhoto = nil }
-                )
-            ) {
-                if let image = viewModel.takenPhoto {
-                    Image(uiImage: image)
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
+            .sheet(isPresented: $isShowingDetailSheet) {
+                if let post = selectedImagePost {
+                    ImageDetailSheet(imageURL: post.URLString, date: post.created)
                 }
             }
             .refreshable {
@@ -210,6 +210,51 @@ struct HomeView: View {
         // Ensure user is not nil before fetching
         guard let uid = AuthManager.shared.user?.uid else { return }
         self.images = try await FirebaseManager.getAllItems(uid: uid)
+    }
+}
+
+struct ImageDetailSheet: View {
+    @StateObject private var viewModel = HomeViewModel()
+    @Environment(\.dismiss) var dismiss
+    let imageURL: String?
+    let date: Date?
+
+//    var formattedDate: String {
+//        guard let date = date else { return "" }
+//        let formatter = DateFormatter()
+//        formatter.dateStyle = .long
+//        formatter.timeStyle = .none
+//        formatter.locale = Locale.current
+//        return formatter.string(from: date)
+//    }
+
+    var body: some View {
+        VStack(spacing: 20) {
+            HStack {
+                Spacer()
+            }
+
+            if let urlString = imageURL, let url = URL(string: urlString) {
+                AsyncImage(url: url) { image in
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(maxWidth: .infinity)
+                        .cornerRadius(12)
+                        .shadow(radius: 10)
+                } placeholder: {
+                    ProgressView()
+                }
+            } else {
+                Text("画像がありません")
+            }
+
+            Text(viewModel.formattedDate)
+                .font(.title2)
+                .fontWeight(.bold)
+                .padding(.top, 30)
+        }
+        .padding()
     }
 }
 

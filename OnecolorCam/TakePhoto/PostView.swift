@@ -37,7 +37,6 @@ struct PostView: View {
                     Text("Hello, World!")
                     
                     
-                    
                     Renderable(trigger: $updateCounter) {
                         Image(uiImage: image)
                             .resizable()
