@@ -76,10 +76,20 @@ struct HomeView: View {
                     .ignoresSafeArea()
                 
                 VStack {
-                    Text(viewModel.formattedDate)
-                        .font(.system(size: 20))
-                        .padding()
-                        .foregroundColor(.black)
+                    HStack(spacing: 12) {
+                        Text(viewModel.formattedDate)
+                            .font(.system(size: 20))
+                            .foregroundColor(.black)
+                        if let uid = AuthManager.shared.user?.uid {
+                            Circle()
+                                .fill(colorForToday(date: Date(), uid: uid)) // 今日の色
+                                .frame(width: 17, height: 17)                 // 丸の大きさ
+//                                .overlay(
+//                                    Circle().stroke(Color.black.opacity(0.1), lineWidth: 1)
+//                                )
+                        }
+                    }
+                    .padding()
                     
                     HStack(spacing: 2) {
                         let weekDays = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]
@@ -130,6 +140,36 @@ struct HomeView: View {
                         }
                     }
                     Spacer()
+                    
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        LazyHStack(spacing: 23) {
+                            ForEach(images.sorted { $0.created > $1.created }, id: \.id) { post in
+                                if let url = URL(string: post.URLString) {
+                                    AsyncImage(url: url) { image in
+                                        image
+                                            .resizable()
+                                            .aspectRatio(1, contentMode: .fill)
+                                            .frame(width: 150, height: 150)
+                                            .clipped()
+                                            .cornerRadius(12)
+                                            .shadow(radius: 4)
+                                            .onTapGesture {
+                                                // タップしたら詳細シートを出す
+                                                postsForSelectedDay = [post]
+                                                startIndex = 0
+                                                isShowingPager = true
+                                            }
+                                    } placeholder: {
+                                        ProgressView()
+                                            .frame(width: 120, height: 120)
+                                    }
+                                }
+                            }
+                        }
+//                        .padding(.horizontal)
+                    }
+                    .frame(height: 150)
+                    .padding(.horizontal, -16)
                     
                     // Bottom navigation buttons
                     HStack(spacing: 34) {
@@ -185,7 +225,7 @@ struct HomeView: View {
                         }
                         .offset(y: -10)
                     }
-                    .padding(.bottom, 30)
+                    .padding(.vertical, 30)
                 }
                 .padding()
             }

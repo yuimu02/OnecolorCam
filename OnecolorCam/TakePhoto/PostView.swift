@@ -20,6 +20,7 @@ struct PostView: View {
     @State var updateCounter = 0
     
     
+    
     init(image: UIImage) {
         self._image = .init(initialValue: image)
     }
@@ -34,14 +35,12 @@ struct PostView: View {
                     .opacity(0.7)
                 
                 VStack {
-                    Text("Hello, World!")
-                    
-                    
                     Renderable(trigger: $updateCounter) {
                         Image(uiImage: image)
                             .resizable()
                             .scaledToFit()
                             .frame(width: 300, height: 300)
+                            .cornerRadius(20)
                             .colorEffect(
                                 Shader(
                                     function: ShaderFunction(
@@ -50,7 +49,7 @@ struct PostView: View {
                                     ),
                                     arguments: [
                                         .float(getTodayHue()),
-                                        .float(0.2),
+                                        .float(0.06),
                                     ]
                                 )
                             )
@@ -73,10 +72,45 @@ struct PostView: View {
                                     }
                         }
                     }
-
-                    Button("画像をアップロード") {
-                        updateCounter += 1
+                    
+                    HStack(spacing: 100) {
+                        Button {
+                            updateCounter += 1
+                        } label: {
+                            Image(systemName: "arrow.down.to.line.compact")
+                                .font(.system(size: 30))
+                                .foregroundColor(.black)
+                                .frame(width: 60, height: 60)
+                                .background(
+                                    Circle()
+                                        .fill(Color.white.opacity(0.3))
+                                        .shadow(color: .black.opacity(0.7), radius: 4, x: 0, y: 2)
+                                )
+                                .overlay(
+                                    Circle()
+                                        .stroke(Color.black, lineWidth: 0.8)
+                                )
+                        }
+                        
+                        Button {
+                            
+                        } label: {
+                            Image(systemName: "paperplane")
+                                .font(.system(size: 30))
+                                .foregroundColor(.black)
+                                .frame(width: 60, height: 60)
+                                .background(
+                                    Circle()
+                                        .fill(Color.white.opacity(0.3))
+                                        .shadow(color: .black.opacity(0.7), radius: 4, x: 0, y: 2)
+                                )
+                                .overlay(
+                                    Circle()
+                                        .stroke(Color.black, lineWidth: 0.8)
+                                )
+                        }
                     }
+                    .padding(.top, 40)
                 }
             }
         } else {
