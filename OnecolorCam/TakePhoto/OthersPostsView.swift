@@ -127,7 +127,7 @@ struct OthersPostsView: View {
                         }
                         .offset(y: -10)
                     }
-                    .padding(.bottom, 30)
+                    .padding()
                 }
             }
             .padding()

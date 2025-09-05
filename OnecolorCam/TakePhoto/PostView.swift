@@ -13,12 +13,15 @@ import FirebaseStorage
 import FirebaseFirestore
 import RenderableView
 import ColorExtensions
+
 struct PostView: View {
     @Environment(AuthManager.self) var authManager
     @StateObject private var viewModel = HomeViewModel()
     @Binding var tab: Tab
     @State private var image: UIImage
     @State private var updateCounter = 0
+    @Environment(\.dismiss) private var dismiss
+    @State private var willPostPublic = false
     
     
     
@@ -52,6 +55,18 @@ struct PostView: View {
                 }
                 .padding()
                 
+                    Button {
+                        dismiss()
+                    } label: {
+                        Label("撮り直し", systemImage: "arrow.counterclockwise")
+                            .font(.system(size: 14, weight: .semibold))
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .background(.ultraThinMaterial)
+                            .clipShape(Capsule())
+                            .overlay(Capsule().stroke(Color.black.opacity(0.15), lineWidth: 0.5))
+                    }
+                    
                     Renderable(trigger: $updateCounter) {
                         Image(uiImage: image)
                             .resizable()
@@ -83,8 +98,18 @@ struct PostView: View {
                                         let imageURL = try await FirebaseManager.sendImage(image: image, folderName: "folder")
                                         print("アップロード成功:", imageURL)
                                         
-                                        let newPost = IMagepost(URLString: imageURL.absoluteString, publiccolor: colorForToday(date: Date(), uid: uid).hex)
-                                        try await FirebaseManager.addItem(item: newPost, uid: uid)
+                                              if willPostPublic {
+                                                // 公開：publiccolor を入れて保存 → publicPhotos 側へ
+                                                let hex = colorForToday(date: Date(), uid: uid).hex
+                                                let newPost = IMagepost(URLString: imageURL.absoluteString, publiccolor: hex)
+                                                try FirebaseManager.addItem(item: newPost, uid: uid)
+                                              } else {
+                                                // 非公開：publiccolor は nil → users/{uid}/posts 側へ
+                                                let newPost = IMagepost(URLString: imageURL.absoluteString, publiccolor: nil)
+                                                try FirebaseManager.addItem(item: newPost, uid: uid)
+                                              }
+                                        
+                                        
                                     } catch {
                                         print("アップロード失敗:", error)
                                     }
@@ -93,7 +118,9 @@ struct PostView: View {
                     
                     HStack(spacing: 100) {
                         Button {
-                            updateCounter += 1
+                                willPostPublic = false       // ← 公開（publicPhotos）
+                                updateCounter += 1
+                            dismiss()
                             tab = .home
                         } label: {
                             Image(systemName: "arrow.down.to.line.compact")
@@ -113,7 +140,9 @@ struct PostView: View {
                         
                         
                         Button {
+                            willPostPublic = true
                             updateCounter += 1
+                            dismiss()
                             tab = .home
                         } label: {
                             Image(systemName: "paperplane")
@@ -138,6 +167,8 @@ struct PostView: View {
             SignInWithAppleFirebaseButton()
         }
     }
+    
+    
     func getTodayHue() -> Float {
             guard let uid = AuthManager.shared.user?.uid else { return 0.0 }
             let todaysColor = colorForToday(date: Date(), uid: uid)

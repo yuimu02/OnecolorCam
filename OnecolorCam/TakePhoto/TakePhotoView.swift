@@ -67,6 +67,8 @@ struct TakePhotoView: View {
                         //                                )
                     }
                 }
+                .padding(.top, 45)
+                .padding(.bottom, 14)
                 .padding()
                 
                 GeometryReader { geometry in
@@ -78,8 +80,8 @@ struct TakePhotoView: View {
                     }
                     .aspectRatio(1, contentMode: .fit) // 正方形をここで担保
                     .frame(width: width)               // 高さは比率から決まるので指定しない
-                    .clipped()
-                    .cornerRadius(12)
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .compositingGroup()
                     .padding(.horizontal, 20)
                     .padding(.top, 40)
                 }
@@ -162,10 +164,16 @@ struct TakePhotoView: View {
         .navigationDestination(isPresented: $isShowingPostView) {
             if let img = capturedImage {
                 PostView(image: img, tab: $tab)
+                    .navigationBarBackButtonHidden(true)
             } else {
                 EmptyView()
             }
         }
+//        .onChange(of: isShowingPostView) { newValue in
+//            if !newValue {
+//                capturedImage = nil       // 戻ってきたときだけリセット
+//            }
+//        }
     }
 }
 }

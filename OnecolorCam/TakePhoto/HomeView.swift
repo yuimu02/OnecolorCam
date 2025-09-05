@@ -85,11 +85,13 @@ struct HomeView: View {
                             Circle()
                                 .fill(colorForToday(date: Date(), uid: uid)) // 今日の色
                                 .frame(width: 17, height: 17)                 // 丸の大きさ
-//                                .overlay(
-//                                    Circle().stroke(Color.black.opacity(0.1), lineWidth: 1)
-//                                )
+                            //                                .overlay(
+                            //                                    Circle().stroke(Color.black.opacity(0.1), lineWidth: 1)
+                            //                                )
                         }
                     }
+                    .padding(.top, 45)
+                    .padding(.bottom, 14)
                     .padding()
                     
                     HStack(spacing: 2) {
@@ -128,7 +130,7 @@ struct HomeView: View {
                                         }
                                         .clipped() // Prevents the image from overflowing its frame
                                         .clipShape(RoundedRectangle(cornerRadius: 4))
-
+                                        
                                     } else {
                                         // If no image, display the day number
                                         Text("\(day)")
@@ -167,10 +169,11 @@ struct HomeView: View {
                                 }
                             }
                         }
-//                        .padding(.horizontal)
+                        //                        .padding(.horizontal)
                     }
                     .frame(height: 150)
                     .padding(.horizontal, -16)
+                    .padding(.top, 33)
                     
                     // Bottom navigation buttons
                     HStack(spacing: 34) {
@@ -237,7 +240,7 @@ struct HomeView: View {
             .onAppear {
                 viewModel.updateDate()
                 Task {
-                    try? await loadAllPrivateImages()
+                    Task { await loadAllImagesMixed()}
                 }
             }
             .sheet(isPresented: $isShowingPager) {
@@ -245,20 +248,42 @@ struct HomeView: View {
             }
             .refreshable {
                 Task {
-                    try? await loadAllPrivateImages()
+                    await loadAllImagesMixed()
                 }
             }
         }
     }
     
-    func loadAllPrivateImages() async throws {
-        // Ensure user is not nil before fetching
+    //    func loadAllPrivateImages() async throws {
+    //        // Ensure user is not nil before fetching
+    //        guard let uid = AuthManager.shared.user?.uid else { return }
+    //        self.images = try await FirebaseManager.getAllPrivateItems(uid: uid)
+    //    }
+    //}
+    
+    @MainActor
+    func loadAllImagesMixed() async {
         guard let uid = AuthManager.shared.user?.uid else { return }
-        self.images = try await FirebaseManager.getAllPrivateItems(uid: uid)
+        do {
+            async let priv = FirebaseManager.getAllPrivateItems(uid: uid)
+            async let pub  = FirebaseManager.getAllPublicItems()
+            let (privateItems, publicItems) = try await (priv, pub)
+            
+            let merged = privateItems + publicItems
+            
+            // 重複除去（id があれば id を、無ければ URLString をキーに）
+            var seen = Set<String>()
+            let unique = merged.filter { p in
+                let key = p.id ?? p.URLString
+                return seen.insert(key).inserted
+            }
+            
+            self.images = unique.sorted { $0.created > $1.created }
+        } catch {
+            print("loadAllImagesMixed error:", error)
+        }
     }
 }
-
-
 
 
 struct ImageDetailPagerSheet: View {
@@ -266,14 +291,15 @@ struct ImageDetailPagerSheet: View {
     let posts: [IMagepost]
     @State var index: Int   // 開始位置
 
-    private let df: DateFormatter = {
+    private static let df: DateFormatter = {
         let f = DateFormatter()
-        f.dateStyle = .long
-        f.timeStyle = .none
-        f.locale = .current
+        f.locale = Locale(identifier: "en_US_POSIX")
+        f.calendar = Calendar(identifier: .gregorian)
+        f.timeZone = TimeZone(identifier: "Asia/Tokyo")
+        f.dateFormat = "yyyy.MM.dd.E"
         return f
     }()
-
+    
     var body: some View {
         VStack(spacing: 0) {
 
@@ -294,10 +320,9 @@ struct ImageDetailPagerSheet: View {
                         } else {
                             Text("画像がありません")
                         }
-
-                        Text(viewModel.formattedDate)
+                        Text(Self.df.string(from: posts[i].created))
                             .font(.title3).bold()
-                            .padding(.vertical,30)
+                            .padding(.top,50)
                     }
                     .padding(.horizontal)
                     .tag(i)
