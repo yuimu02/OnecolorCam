@@ -286,7 +286,7 @@ struct ImageDetailPagerSheet: View {
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
                                     .frame(maxWidth: .infinity)
-                                    .cornerRadius(12)
+                                    .cornerRadius(22)
                                     .shadow(radius: 10)
                             } placeholder: {
                                 ProgressView()

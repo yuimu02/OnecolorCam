@@ -47,7 +47,7 @@ struct OthersPostsView: View {
                                                     .resizable()
                                                     .aspectRatio(contentMode: .fit)
                                                     .frame(maxWidth: .infinity)
-                                                    .cornerRadius(14)
+                                                    .cornerRadius(21)
                                                     .shadow(radius: 10)
                                             case .failure:
                                                 ZStack {
