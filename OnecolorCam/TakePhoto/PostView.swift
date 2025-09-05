@@ -12,7 +12,7 @@ import Firebase
 import FirebaseStorage
 import FirebaseFirestore
 import RenderableView
-
+import ColorExtensions
 struct PostView: View {
     @Environment(AuthManager.self) var authManager
     @StateObject private var viewModel = HomeViewModel()
@@ -82,7 +82,8 @@ struct PostView: View {
                                         // Firebaseにアップロード
                                         let imageURL = try await FirebaseManager.sendImage(image: image, folderName: "folder")
                                         print("アップロード成功:", imageURL)
-                                        let newPost = IMagepost(URLString: imageURL.absoluteString)
+                                        
+                                        let newPost = IMagepost(URLString: imageURL.absoluteString, publiccolor: colorForToday(date: Date(), uid: uid).hex)
                                         try await FirebaseManager.addItem(item: newPost, uid: uid)
                                     } catch {
                                         print("アップロード失敗:", error)
@@ -110,8 +111,10 @@ struct PostView: View {
                                 )
                         }
                         
+                        
                         Button {
-                            
+                            updateCounter += 1
+                            tab = .home
                         } label: {
                             Image(systemName: "paperplane")
                                 .font(.system(size: 30))

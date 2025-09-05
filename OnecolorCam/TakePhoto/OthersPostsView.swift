@@ -7,17 +7,16 @@
 
 import SwiftUI
 import ColorfulX
-
-struct SamplePublicPhoto: Identifiable {
-    let id = UUID()
-    let imageName: String
-    let color: Color
-}
+import ColorExtensions
+import AppleSignInFirebase
 
 struct OthersPostsView: View {
     @StateObject private var viewModel = HomeViewModel()
-    @State private var posts: [SamplePublicPhoto] = []
+
+    // 本番は IMagepost をそのまま使う
+    @State private var posts: [IMagepost] = []
     @State private var index: Int = 0
+
     @Binding var tab: Tab
 
     var body: some View {
@@ -28,11 +27,8 @@ struct OthersPostsView: View {
                 .opacity(0.7)
 
             VStack {
-                // 見出しなど必要なら
-                // Text("Everyone's Photos").font(.headline)
-
                 if posts.isEmpty {
-                    Text("No samples")
+                    Text("No public posts yet")
                         .font(.headline)
                         .padding()
                 } else {
@@ -40,12 +36,41 @@ struct OthersPostsView: View {
                         TabView(selection: $index) {
                             ForEach(posts.indices, id: \.self) { i in
                                 VStack(spacing: 16) {
-                                    Image(posts[i].imageName)
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fit)
-                                        .frame(maxWidth: .infinity)
-                                        .cornerRadius(14)
-                                        .shadow(radius: 10)
+                                    if let url = URL(string: posts[i].URLString) {
+                                        AsyncImage(url: url) { phase in
+                                            switch phase {
+                                            case .empty:
+                                                ProgressView()
+                                                    .frame(maxWidth: .infinity, minHeight: 200)
+                                            case .success(let image):
+                                                image
+                                                    .resizable()
+                                                    .aspectRatio(contentMode: .fit)
+                                                    .frame(maxWidth: .infinity)
+                                                    .cornerRadius(14)
+                                                    .shadow(radius: 10)
+                                            case .failure:
+                                                ZStack {
+                                                    RoundedRectangle(cornerRadius: 14)
+                                                        .fill(.ultraThinMaterial)
+                                                    Image(systemName: "photo")
+                                                        .font(.system(size: 40, weight: .light))
+                                                        .foregroundColor(.secondary)
+                                                }
+                                                .frame(maxWidth: .infinity, minHeight: 200)
+                                            @unknown default:
+                                                EmptyView()
+                                            }
+                                        }
+                                    } else {
+                                        ZStack {
+                                            RoundedRectangle(cornerRadius: 14)
+                                                .fill(.ultraThinMaterial)
+                                            Text("Invalid URL")
+                                                .foregroundColor(.secondary)
+                                        }
+                                        .frame(maxWidth: .infinity, minHeight: 200)
+                                    }
                                 }
                                 .padding(.horizontal)
                                 .tag(i)
@@ -58,11 +83,9 @@ struct OthersPostsView: View {
                         }
                     }
 
-                    // ボトムナビ
+                    // Bottom nav
                     HStack(spacing: 34) {
-                        Button {
-                            tab = .home
-                        } label: {
+                        Button { tab = .home } label: {
                             Image(systemName: "house")
                                 .font(.system(size: 30))
                                 .foregroundColor(.black)
@@ -72,16 +95,11 @@ struct OthersPostsView: View {
                                         .fill(Color.white.opacity(0.3))
                                         .shadow(color: .black.opacity(0.7), radius: 4, x: 0, y: 2)
                                 )
-                                .overlay(
-                                    Circle()
-                                        .stroke(Color.black, lineWidth: 0.8)
-                                )
+                                .overlay(Circle().stroke(Color.black, lineWidth: 0.8))
                         }
                         .offset(y: -10)
 
-                        Button {
-                            tab = .camera
-                        } label: {
+                        Button { tab = .camera } label: {
                             Image(systemName: "camera")
                                 .font(.system(size: 30))
                                 .foregroundColor(.black)
@@ -91,15 +109,11 @@ struct OthersPostsView: View {
                                         .fill(Color.white.opacity(0.3))
                                         .shadow(color: .black.opacity(0.7), radius: 4, x: 0, y: 2)
                                 )
-                                .overlay(
-                                    Circle()
-                                        .stroke(Color.black, lineWidth: 0.8)
-                                )
+                                .overlay(Circle().stroke(Color.black, lineWidth: 0.8))
                         }
                         .offset(y: 10)
 
-                        Button {
-                        } label: {
+                        Button {} label: {
                             Image(systemName: "person.3.fill")
                                 .font(.system(size: 25))
                                 .foregroundColor(.black)
@@ -109,42 +123,53 @@ struct OthersPostsView: View {
                                         .fill(Color.white.opacity(0.3))
                                         .shadow(color: .black.opacity(0.7), radius: 4, x: 0, y: 2)
                                 )
-                                .overlay(
-                                    Circle()
-                                        .stroke(Color.black, lineWidth: 1.7)
-                                )
+                                .overlay(Circle().stroke(Color.black, lineWidth: 1.7))
                         }
                         .offset(y: -10)
                     }
                     .padding(.bottom, 30)
                 }
             }
-            .padding() // 全体の余白（ScrollView を置くなら無視したいところだけ個別に調整）
+            .padding()
         }
-        // ここに付けるのが大事（VStack 内だと発火しない場合がある）
         .onAppear {
-            // 左端＝最新 → 右へ行くほど古い
-            posts = [
-                SamplePublicPhoto(imageName: "Sample", color: .red),
-                SamplePublicPhoto(imageName: "Sample2", color: .blue),
-                SamplePublicPhoto(imageName: "Sample3", color: .pink),
-                SamplePublicPhoto(imageName: "Sample4", color: .green),
-                SamplePublicPhoto(imageName: "Sample5", color: .brown)
-            ]
+            posts = []
             index = 0
-            applyBackground(for: 0) // 初期表示でも背景反映
+            applyBackground(for: 0) // 初期反映
+            Task { await loadPublic() }
+        }
+        .refreshable {
+            await loadPublic()
         }
     }
 
+    // MARK: - Data Load
+    @MainActor
+    private func loadPublic() async {
+        do {
+            let uid = AuthManager.shared.user?.uid ?? "" // 署名に合わせて一応渡す
+            let items = try await FirebaseManager.getAllPublicItems(uid: uid)
 
+            // created の新しい順（Firestoreで orderBy 済みなら不要）
+            let sorted = items.sorted { $0.created > $1.created }
+
+            self.posts = sorted
+            self.index = 0
+            applyBackground(for: 0)
+        } catch {
+            print("public load error:", error.localizedDescription)
+        }
+    }
+
+    // MARK: - Background
     private func applyBackground(for idx: Int) {
         guard posts.indices.contains(idx) else { return }
-        let base = posts[idx].color
+        // publiccolor（Hex）→ ColorExtensions で Color 化
+        let base: Color = (posts[idx].publiccolor?.color) ?? .gray
         viewModel.colors = makePalette(from: base)
     }
 
     private func makePalette(from base: Color) -> [Color] {
-        // 必要なら getNearColors(...) に置き換えてOK
         [
             base,
             base.opacity(0.85),
@@ -155,6 +180,3 @@ struct OthersPostsView: View {
     }
 }
 
-//#Preview {
-//    OthersPostsView()
-//}

@@ -237,7 +237,7 @@ struct HomeView: View {
             .onAppear {
                 viewModel.updateDate()
                 Task {
-                    try? await loadAllImages()
+                    try? await loadAllPrivateImages()
                 }
             }
             .sheet(isPresented: $isShowingPager) {
@@ -245,18 +245,21 @@ struct HomeView: View {
             }
             .refreshable {
                 Task {
-                    try? await loadAllImages()
+                    try? await loadAllPrivateImages()
                 }
             }
         }
     }
     
-    func loadAllImages() async throws {
+    func loadAllPrivateImages() async throws {
         // Ensure user is not nil before fetching
         guard let uid = AuthManager.shared.user?.uid else { return }
-        self.images = try await FirebaseManager.getAllItems(uid: uid)
+        self.images = try await FirebaseManager.getAllPrivateItems(uid: uid)
     }
 }
+
+
+
 
 struct ImageDetailPagerSheet: View {
     @StateObject private var viewModel = HomeViewModel()

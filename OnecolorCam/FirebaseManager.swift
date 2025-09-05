@@ -33,13 +33,13 @@ enum FirebaseManager {
 
     static func addItem(item: IMagepost, uid: String) throws {
         print(uid)
-        try db.collection("users").document(uid).collection("posts").addDocument(from: item)
+        if item.publiccolor == nil{
+            try db.collection("users").document(uid).collection("posts").addDocument(from: item)
+        } else {
+            try db.collection("publicPhotos").addDocument(from: item)
+        }
     }
-    
-    static func addPublicItem(item: IMagepost, uid: String) throws {
-        print(uid)
-        try db.collection("publicPhotos").addDocument(from: item)
-    }
+
     
 
     static func deleteItem(id: String, uid: String) throws {
@@ -54,8 +54,16 @@ enum FirebaseManager {
         return try await db.collection("users").document(uid).collection("posts").document(id).getDocument(as: IMagepost.self)
     }
 
-    static func getAllItems(uid: String) async throws -> [IMagepost] {
+    static func getAllPrivateItems(uid: String) async throws -> [IMagepost] {
         return try await db.collection("users").document(uid).collection("posts").getDocuments().documents.map { try $0.data(as: IMagepost.self) }
+    }
+    
+    static func getAllPublicItems(uid: String = "") async throws -> [IMagepost] {
+        try await db.collection("publicPhotos")
+            .order(by: "created", descending: true)   // 任意（新しい順）
+            .getDocuments()
+            .documents
+            .map { try $0.data(as: IMagepost.self) }
     }
     
 }
