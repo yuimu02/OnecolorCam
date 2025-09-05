@@ -7,6 +7,7 @@
 
 import FirebaseFirestore
 import FirebaseStorage
+import ColorExtensions
 
 extension String: @retroactive LocalizedError {
     public var errorDescription: String? {

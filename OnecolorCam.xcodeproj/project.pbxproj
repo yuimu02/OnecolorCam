@@ -12,6 +12,7 @@
 		C1498BF82E57451D00E46AC7 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = C1498BF72E57451D00E46AC7 /* FirebaseStorage */; };
 		C1AFB7D22E5F153600041053 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = C1AFB7D12E5F153600041053 /* FirebaseFirestore */; };
 		C1AFB7DD2E6845AA00041053 /* RenderableView in Frameworks */ = {isa = PBXBuildFile; productRef = C1AFB7DC2E6845AA00041053 /* RenderableView */; };
+		C1AFB80B2E6AD67E00041053 /* ColorExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = C1AFB80A2E6AD67E00041053 /* ColorExtensions */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -33,6 +34,7 @@
 			files = (
 				C1498BDE2E55A4AF00E46AC7 /* AppleSignInFirebase in Frameworks */,
 				C1AFB7D22E5F153600041053 /* FirebaseFirestore in Frameworks */,
+				C1AFB80B2E6AD67E00041053 /* ColorExtensions in Frameworks */,
 				C1AFB7DD2E6845AA00041053 /* RenderableView in Frameworks */,
 				C13342FD2E30E1D200B2BCB4 /* ColorfulX in Frameworks */,
 				C1498BF82E57451D00E46AC7 /* FirebaseStorage in Frameworks */,
@@ -91,6 +93,7 @@
 				C1498BF72E57451D00E46AC7 /* FirebaseStorage */,
 				C1AFB7D12E5F153600041053 /* FirebaseFirestore */,
 				C1AFB7DC2E6845AA00041053 /* RenderableView */,
+				C1AFB80A2E6AD67E00041053 /* ColorExtensions */,
 			);
 			productName = OnecolorCam;
 			productReference = C1A781012DC0F9DA00D77FB3 /* OnecolorCam.app */;
@@ -125,6 +128,7 @@
 				C1498BDC2E55A4AF00E46AC7 /* XCRemoteSwiftPackageReference "AppleSignInFirebase" */,
 				C1498BF52E55E3C400E46AC7 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				C1AFB7DB2E6845AA00041053 /* XCRemoteSwiftPackageReference "RenderableView" */,
+				C1AFB8092E6AD67E00041053 /* XCRemoteSwiftPackageReference "ColorExtensions" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = C1A781022DC0F9DA00D77FB3 /* Products */;
@@ -398,6 +402,14 @@
 				kind = branch;
 			};
 		};
+		C1AFB8092E6AD67E00041053 /* XCRemoteSwiftPackageReference "ColorExtensions" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/yukiny0811/ColorExtensions.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -425,6 +437,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C1AFB7DB2E6845AA00041053 /* XCRemoteSwiftPackageReference "RenderableView" */;
 			productName = RenderableView;
+		};
+		C1AFB80A2E6AD67E00041053 /* ColorExtensions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C1AFB8092E6AD67E00041053 /* XCRemoteSwiftPackageReference "ColorExtensions" */;
+			productName = ColorExtensions;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

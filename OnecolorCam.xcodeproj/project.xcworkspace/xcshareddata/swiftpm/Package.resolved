@@ -1,5 +1,5 @@
 {
-  "originHash" : "1cab3273a643fbe88ec683549a1dbaead1cc02cea9ad88b4446c7703c1cb187d",
+  "originHash" : "bf10e149806a3ba617de9c9b8fc0efcbc9fdc3f2bc2d665ff6214a47421dc905",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -26,6 +26,15 @@
       "state" : {
         "branch" : "main",
         "revision" : "729f9d5f8655a77bb91d04e0d244b0bd3a8afefb"
+      }
+    },
+    {
+      "identity" : "colorextensions",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/yukiny0811/ColorExtensions.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "c0af41510b844df84af533a1fb41007c509cd8fa"
       }
     },
     {

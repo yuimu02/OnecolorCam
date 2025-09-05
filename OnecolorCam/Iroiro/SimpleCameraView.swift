@@ -11,7 +11,7 @@ public struct SimpleCameraView: View {
 
     @Binding var trigger: Trigger
     let onTakePhoto: (UIImage) async -> ()
-    let vc = CameraViewController()
+    @State var vc = CameraViewController()
 
     public init(trigger: Binding<Trigger>, _ onTakePhoto: @escaping (UIImage) async -> ()) {
         self.onTakePhoto = onTakePhoto

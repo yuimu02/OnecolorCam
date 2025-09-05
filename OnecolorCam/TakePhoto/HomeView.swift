@@ -15,8 +15,9 @@ struct IMagepost: Codable {
     @DocumentID var id: String?
     var created:Date = Date()
     var URLString:String
-//    var color: String
+    var publiccolor: String?
 }
+
 
 struct HomeView: View {
     let year: Int
