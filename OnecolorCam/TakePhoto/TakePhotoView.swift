@@ -7,6 +7,7 @@
 
 import SwiftUI
 import ColorfulX
+import AppleSignInFirebase
 
     extension UIImage {
         func croppedToSquare() -> UIImage {
@@ -39,11 +40,12 @@ import ColorfulX
 struct TakePhotoView: View {
     @StateObject private var viewModel = HomeViewModel()
     @State var trigger = Trigger()
-    @State private var currentTab: Tab = .camera
     @State private var capturedImage: UIImage? = nil
     @State private var isShowingPostView = false
+    @Binding var tab: Tab
     
     var body: some View {
+        NavigationStack {
         ZStack {
             Color.white
                 .ignoresSafeArea()
@@ -52,26 +54,36 @@ struct TakePhotoView: View {
                 .opacity(0.7)
             
             VStack {
-                Text(viewModel.formattedDate)
-                    .font(.system(size: 20))
-                    .padding()
-                    .foregroundColor(.black)
+                HStack(spacing: 12) {
+                    Text(viewModel.formattedDate)
+                        .font(.system(size: 20))
+                        .foregroundColor(.black)
+                    if let uid = AuthManager.shared.user?.uid {
+                        Circle()
+                            .fill(colorForToday(date: Date(), uid: uid)) // 今日の色
+                            .frame(width: 17, height: 17)                 // 丸の大きさ
+                        //                                .overlay(
+                        //                                    Circle().stroke(Color.black.opacity(0.1), lineWidth: 1)
+                        //                                )
+                    }
+                }
+                .padding()
                 
                 GeometryReader { geometry in
-                    let side = min(geometry.size.width - 40, geometry.size.height)
+                    let width = max(1, geometry.size.width - 40)
+
                     SimpleCameraView(trigger: $trigger) { uiimage in
-                        print("photo taken")
                         capturedImage = uiimage.croppedToSquare()
                         isShowingPostView = true
                     }
-                    .frame(width: side, height: side)
-                    .scaledToFill()
+                    .aspectRatio(1, contentMode: .fit) // 正方形をここで担保
+                    .frame(width: width)               // 高さは比率から決まるので指定しない
                     .clipped()
                     .cornerRadius(12)
                     .padding(.horizontal, 20)
-                    .padding(.top, 40) // 少し上に余白
+                    .padding(.top, 40)
                 }
-                .aspectRatio(1, contentMode: .fit)
+
                 
                 Button() {
                     trigger.fire()
@@ -88,64 +100,71 @@ struct TakePhotoView: View {
                 .padding(.top, 33)
                 
                 HStack(spacing: 34) {
-                    NavigationLink(destination: HomeView(year: 2025, month: 8)) {
-                            Image(systemName: "house")
+                    Button {
+                        tab = .home
+                    } label: {
+                        Image(systemName: "house")
                             .font(.system(size: 30))
-                                .foregroundColor(.black)
-                        .frame(width: 80, height: 80)
-                        .background(
-                        Circle()
-                            .fill(Color.white.opacity(0.3)) // 背景も丸く
-                            .shadow(color: .black.opacity(0.7), radius: 4, x: 0, y: 2)
-                    )
-                    .overlay(
-                        Circle()
-                            .stroke(Color.black, lineWidth: 0.8) // 黒い縁
-                    )
+                            .foregroundColor(.black)
+                            .frame(width: 80, height: 80)
+                            .background(
+                                Circle()
+                                    .fill(Color.white.opacity(0.3)) // 背景も丸く
+                                    .shadow(color: .black.opacity(0.7), radius: 4, x: 0, y: 2)
+                            )
+                            .overlay(
+                                Circle()
+                                    .stroke(Color.black, lineWidth: 0.8) // 黒い縁
+                            )
                     }
                     .offset(y: -10)
                     
-                    NavigationLink(destination: TakePhotoView()) {
-                            Image(systemName: "camera.fill")
-                                .font(.system(size: 30))
-                                .foregroundColor(.black)
-                        .frame(width: 80, height: 80)
-                        .background(
-                        Circle()
-                            .fill(Color.white.opacity(0.3)) // 背景も丸く
-                            .shadow(color: .black.opacity(0.7), radius: 4, x: 0, y: 2)
-                    )
-                        .overlay(
-                            Circle()
-                                .stroke(Color.black, lineWidth: 1.7) // 黒い縁
-                        )
+                    Button {
+                    } label: {
+                        Image(systemName: "camera.fill")
+                            .font(.system(size: 30))
+                            .foregroundColor(.black)
+                            .frame(width: 80, height: 80)
+                            .background(
+                                Circle()
+                                    .fill(Color.white.opacity(0.3)) // 背景も丸く
+                                    .shadow(color: .black.opacity(0.7), radius: 4, x: 0, y: 2)
+                            )
+                            .overlay(
+                                Circle()
+                                    .stroke(Color.black, lineWidth: 1.7) // 黒い縁
+                            )
                     }
                     .offset(y: 10)
-                    .disabled(currentTab == .camera)
                     
-                    NavigationLink(destination: OthersPostsView()) {
-                            Image(systemName: "person.3")
+                    Button {
+                        tab = .others
+                    } label: {
+                        Image(systemName: "person.3")
                             .font(.system(size: 25))
-                                .foregroundColor(.black)
-                        .frame(width: 80, height: 80)
-                        .background(
-                        Circle()
-                            .fill(Color.white.opacity(0.3)) // 背景も丸く
-                            .shadow(color: .black.opacity(0.7), radius: 4, x: 0, y: 2)
-                    )
-                        .overlay(
-                            Circle()
-                                .stroke(Color.black, lineWidth: 0.8) // 黒い縁
-                        )
+                            .foregroundColor(.black)
+                            .frame(width: 80, height: 80)
+                            .background(
+                                Circle()
+                                    .fill(Color.white.opacity(0.3)) // 背景も丸く
+                                    .shadow(color: .black.opacity(0.7), radius: 4, x: 0, y: 2)
+                            )
+                            .overlay(
+                                Circle()
+                                    .stroke(Color.black, lineWidth: 0.8) // 黒い縁
+                            )
                     }
                     .offset(y: -10)
                 }
                 .padding(.bottom, 30)
-                    .navigationDestination(isPresented: $isShowingPostView) {
-                        if let image = capturedImage {
-                            PostView(image: image)
-                        }
-                }
+            }
+        }
+        .navigationDestination(isPresented: $isShowingPostView) {
+            if let img = capturedImage {
+                PostView(image: img, tab: $tab)
+            } else {
+                EmptyView()
+            }
         }
     }
 }

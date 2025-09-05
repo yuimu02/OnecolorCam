@@ -16,13 +16,15 @@ import RenderableView
 struct PostView: View {
     @Environment(AuthManager.self) var authManager
     @StateObject private var viewModel = HomeViewModel()
-    @State var image: UIImage
-    @State var updateCounter = 0
+    @Binding var tab: Tab
+    @State private var image: UIImage
+    @State private var updateCounter = 0
     
     
     
-    init(image: UIImage) {
-        self._image = .init(initialValue: image)
+    init(image: UIImage, tab: Binding<Tab>) {
+        self._image = State(initialValue: image)
+        self._tab = tab
     }
     
     var body: some View {
@@ -33,8 +35,23 @@ struct PostView: View {
                 ColorfulView(color: $viewModel.colors)
                     .ignoresSafeArea()
                     .opacity(0.7)
-                
                 VStack {
+                
+                HStack(spacing: 12) {
+                    Text(viewModel.formattedDate)
+                        .font(.system(size: 20))
+                        .foregroundColor(.black)
+                    if let uid = AuthManager.shared.user?.uid {
+                        Circle()
+                            .fill(colorForToday(date: Date(), uid: uid)) // 今日の色
+                            .frame(width: 17, height: 17)                 // 丸の大きさ
+//                                .overlay(
+//                                    Circle().stroke(Color.black.opacity(0.1), lineWidth: 1)
+//                                )
+                    }
+                }
+                .padding()
+                
                     Renderable(trigger: $updateCounter) {
                         Image(uiImage: image)
                             .resizable()
@@ -49,7 +66,7 @@ struct PostView: View {
                                     ),
                                     arguments: [
                                         .float(getTodayHue()),
-                                        .float(0.06),
+                                        .float(0.1),
                                     ]
                                 )
                             )
@@ -76,6 +93,7 @@ struct PostView: View {
                     HStack(spacing: 100) {
                         Button {
                             updateCounter += 1
+                            tab = .home
                         } label: {
                             Image(systemName: "arrow.down.to.line.compact")
                                 .font(.system(size: 30))

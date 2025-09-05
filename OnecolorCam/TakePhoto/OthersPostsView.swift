@@ -18,7 +18,7 @@ struct OthersPostsView: View {
     @StateObject private var viewModel = HomeViewModel()
     @State private var posts: [SamplePublicPhoto] = []
     @State private var index: Int = 0
-    @State private var currentTab: Tab = .others
+    @Binding var tab: Tab
 
     var body: some View {
         ZStack {
@@ -60,7 +60,9 @@ struct OthersPostsView: View {
 
                     // ボトムナビ
                     HStack(spacing: 34) {
-                        NavigationLink(destination: HomeView(year: 2025, month: 8)) {
+                        Button {
+                            tab = .home
+                        } label: {
                             Image(systemName: "house")
                                 .font(.system(size: 30))
                                 .foregroundColor(.black)
@@ -77,7 +79,9 @@ struct OthersPostsView: View {
                         }
                         .offset(y: -10)
 
-                        NavigationLink(destination: TakePhotoView()) {
+                        Button {
+                            tab = .camera
+                        } label: {
                             Image(systemName: "camera")
                                 .font(.system(size: 30))
                                 .foregroundColor(.black)
@@ -94,7 +98,8 @@ struct OthersPostsView: View {
                         }
                         .offset(y: 10)
 
-                        NavigationLink(destination: OthersPostsView()) {
+                        Button {
+                        } label: {
                             Image(systemName: "person.3.fill")
                                 .font(.system(size: 25))
                                 .foregroundColor(.black)
@@ -110,7 +115,6 @@ struct OthersPostsView: View {
                                 )
                         }
                         .offset(y: -10)
-                        .disabled(currentTab == .others)
                     }
                     .padding(.bottom, 30)
                 }
@@ -151,6 +155,6 @@ struct OthersPostsView: View {
     }
 }
 
-#Preview {
-    OthersPostsView()
-}
+//#Preview {
+//    OthersPostsView()
+//}

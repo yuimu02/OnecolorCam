@@ -12,7 +12,7 @@ struct AuthView: View {
     @Environment(AuthManager.self) var authManager
     var body: some View {
         if authManager.isSignedIn {
-            ContentView()
+            RootView()
         } else {
             SignInWithAppleFirebaseButton()
         }

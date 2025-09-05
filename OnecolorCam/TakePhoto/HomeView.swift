@@ -21,10 +21,10 @@ struct IMagepost: Codable {
 struct HomeView: View {
     let year: Int
     let month: Int
+    @Binding var tab: Tab
     
     @StateObject private var viewModel = HomeViewModel()
     @Environment(AuthManager.self) var authManager
-    @State private var currentTab: Tab = .home
     @State var images: [IMagepost] = []
     @State private var isShowingPager = false
     @State private var postsForSelectedDay: [IMagepost] = []
@@ -173,7 +173,8 @@ struct HomeView: View {
                     
                     // Bottom navigation buttons
                     HStack(spacing: 34) {
-                        NavigationLink(destination: HomeView(year: 2025, month: 8)) {
+                        Button {
+                        } label: {
                             Image(systemName: "house.fill")
                                 .font(.system(size: 30))
                                 .foregroundColor(.black)
@@ -189,9 +190,10 @@ struct HomeView: View {
                                 )
                         }
                         .offset(y: -10)
-                        .disabled(currentTab == .home)
                         
-                        NavigationLink(destination: TakePhotoView()) {
+                        Button {
+                            tab = .camera
+                        } label: {
                             Image(systemName: "camera")
                                 .font(.system(size: 30))
                                 .foregroundColor(.black)
@@ -208,7 +210,9 @@ struct HomeView: View {
                         }
                         .offset(y: 10)
                         
-                        NavigationLink(destination: OthersPostsView()) {
+                        Button {
+                            tab = .others
+                        } label: {
                             Image(systemName: "person.3")
                                 .font(.system(size: 25))
                                 .foregroundColor(.black)
@@ -309,6 +313,6 @@ struct GlassRect: View {
     }
 }
 
-#Preview {
-    HomeView(year: 2025, month: 8)
-}
+//#Preview {
+//    HomeView(year: 2025, month: 8)
+//}
