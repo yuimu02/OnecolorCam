@@ -18,6 +18,12 @@ struct IMagepost: Codable {
     var publiccolor: String?
 }
 
+struct ImagePagerPayload: Identifiable {
+    let id = UUID()
+    let posts: [IMagepost]
+    let startIndex: Int
+}
+
 
 struct HomeView: View {
     let year: Int
@@ -30,6 +36,7 @@ struct HomeView: View {
     @State private var isShowingPager = false
     @State private var postsForSelectedDay: [IMagepost] = []
     @State private var startIndex: Int = 0
+    @State private var pagerPayload: ImagePagerPayload?
     
     
     private var days: [Int?] {
@@ -66,7 +73,7 @@ struct HomeView: View {
         
         return images
             .filter { calendar.isDate($0.created, inSameDayAs: targetDate) }
-            .sorted { $0.created < $1.created }
+            .sorted { $0.created > $1.created }
     }
     
     var body: some View {
@@ -115,16 +122,26 @@ struct HomeView: View {
                                     if let first = posts.first, let url = URL(string: first.URLString) {
                                         // If a URL exists, display the image
                                         AsyncImage(url: url) { image in
-                                            image
-                                                .resizable()
-                                                .aspectRatio(1, contentMode: .fit)
-                                                .clipShape(RoundedRectangle(cornerRadius: 4))
-                                                .clipped()
-                                                .onTapGesture {
-                                                    postsForSelectedDay = posts
-                                                    startIndex = 0
-                                                    isShowingPager = true
-                                                }
+//                                            image
+//                                                .resizable()
+//                                                .aspectRatio(1, contentMode: .fit)
+//                                                .clipShape(RoundedRectangle(cornerRadius: 4))
+//                                                .clipped()
+//                                                .onTapGesture {
+//                                                    postsForSelectedDay = posts
+//                                                    startIndex = 0
+//                                                    isShowingPager = true
+//                                                }
+                                            ZStack(alignment: .topLeading) {
+                                                        image
+                                                            .resizable()
+                                                            .aspectRatio(1, contentMode: .fit)
+                                                        DateBadge(day: day)
+                                                    }
+                                                    .clipShape(RoundedRectangle(cornerRadius: 4))
+                                                    .onTapGesture {
+                                                        pagerPayload = .init(posts: posts, startIndex: 0)
+                                                    }
                                         } placeholder: {
                                             ProgressView() // Show a loading indicator
                                         }
@@ -145,7 +162,7 @@ struct HomeView: View {
                     Spacer()
                     
                     ScrollView(.horizontal, showsIndicators: false) {
-                        LazyHStack(spacing: 23) {
+                        LazyHStack(spacing: 0) {
                             ForEach(images.sorted { $0.created > $1.created }, id: \.id) { post in
                                 if let url = URL(string: post.URLString) {
                                     AsyncImage(url: url) { image in
@@ -156,11 +173,9 @@ struct HomeView: View {
                                             .clipped()
                                             .cornerRadius(12)
                                             .shadow(radius: 4)
+                                            .padding(.horizontal, 10)
                                             .onTapGesture {
-                                                // タップしたら詳細シートを出す
-                                                postsForSelectedDay = [post]
-                                                startIndex = 0
-                                                isShowingPager = true
+                                                pagerPayload = .init(posts: [post], startIndex: 0)
                                             }
                                     } placeholder: {
                                         ProgressView()
@@ -243,8 +258,8 @@ struct HomeView: View {
                     Task { await loadAllImagesMixed()}
                 }
             }
-            .sheet(isPresented: $isShowingPager) {
-                ImageDetailPagerSheet(posts: postsForSelectedDay, index: startIndex)
+            .sheet(item: $pagerPayload) { payload in
+                ImageDetailPagerSheet(posts: payload.posts, index: payload.startIndex)
             }
             .refreshable {
                 Task {
@@ -285,6 +300,16 @@ struct HomeView: View {
     }
 }
 
+struct DateBadge: View {
+    let day: Int
+    var body: some View {
+        Text("\(day)")
+            .font(.system(size: 12, weight: .bold))
+            .padding(.horizontal, 6)
+            .padding(.vertical, 2)
+            .foregroundColor(.white)
+    }
+}
 
 struct ImageDetailPagerSheet: View {
     @StateObject private var viewModel = HomeViewModel()

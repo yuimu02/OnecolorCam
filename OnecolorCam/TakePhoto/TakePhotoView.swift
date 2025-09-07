@@ -79,12 +79,13 @@ struct TakePhotoView: View {
                         isShowingPostView = true
                     }
                     .aspectRatio(1, contentMode: .fit) // 正方形をここで担保
-                    .frame(width: width)               // 高さは比率から決まるので指定しない
-                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .frame(width: width)// 高さは比率から決まるので指定しない
+                    .cornerRadius(12)
                     .compositingGroup()
-                    .padding(.horizontal, 20)
-                    .padding(.top, 40)
+                    .frame(maxWidth: .infinity, alignment: .center)
                 }
+                .padding(.horizontal, 14)
+                .padding(.top, 40)
 
                 
                 Button() {

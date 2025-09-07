@@ -13,6 +13,7 @@
 		C1AFB7D22E5F153600041053 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = C1AFB7D12E5F153600041053 /* FirebaseFirestore */; };
 		C1AFB7DD2E6845AA00041053 /* RenderableView in Frameworks */ = {isa = PBXBuildFile; productRef = C1AFB7DC2E6845AA00041053 /* RenderableView */; };
 		C1AFB80B2E6AD67E00041053 /* ColorExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = C1AFB80A2E6AD67E00041053 /* ColorExtensions */; };
+		C1B081062E6C8F4B00CFB946 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = C1B081052E6C8F4B00CFB946 /* Kingfisher */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +35,7 @@
 			files = (
 				C1498BDE2E55A4AF00E46AC7 /* AppleSignInFirebase in Frameworks */,
 				C1AFB7D22E5F153600041053 /* FirebaseFirestore in Frameworks */,
+				C1B081062E6C8F4B00CFB946 /* Kingfisher in Frameworks */,
 				C1AFB80B2E6AD67E00041053 /* ColorExtensions in Frameworks */,
 				C1AFB7DD2E6845AA00041053 /* RenderableView in Frameworks */,
 				C13342FD2E30E1D200B2BCB4 /* ColorfulX in Frameworks */,
@@ -94,6 +96,7 @@
 				C1AFB7D12E5F153600041053 /* FirebaseFirestore */,
 				C1AFB7DC2E6845AA00041053 /* RenderableView */,
 				C1AFB80A2E6AD67E00041053 /* ColorExtensions */,
+				C1B081052E6C8F4B00CFB946 /* Kingfisher */,
 			);
 			productName = OnecolorCam;
 			productReference = C1A781012DC0F9DA00D77FB3 /* OnecolorCam.app */;
@@ -129,6 +132,7 @@
 				C1498BF52E55E3C400E46AC7 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				C1AFB7DB2E6845AA00041053 /* XCRemoteSwiftPackageReference "RenderableView" */,
 				C1AFB8092E6AD67E00041053 /* XCRemoteSwiftPackageReference "ColorExtensions" */,
+				C1B081042E6C8F4B00CFB946 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = C1A781022DC0F9DA00D77FB3 /* Products */;
@@ -293,6 +297,7 @@
 				DEVELOPMENT_TEAM = T3MXB7AQ8F;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = monoful;
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_NSCameraUsageDescription = "カメラへのアクセスを許可";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -325,6 +330,7 @@
 				DEVELOPMENT_TEAM = T3MXB7AQ8F;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = monoful;
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_NSCameraUsageDescription = "カメラへのアクセスを許可";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -410,6 +416,14 @@
 				kind = branch;
 			};
 		};
+		C1B081042E6C8F4B00CFB946 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/onevcat/Kingfisher";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.5.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -442,6 +456,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C1AFB8092E6AD67E00041053 /* XCRemoteSwiftPackageReference "ColorExtensions" */;
 			productName = ColorExtensions;
+		};
+		C1B081052E6C8F4B00CFB946 /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C1B081042E6C8F4B00CFB946 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
