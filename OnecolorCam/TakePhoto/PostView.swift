@@ -95,20 +95,25 @@ struct PostView: View {
                                     
                                     do {
                                         // Firebaseにアップロード
+//                                        let imageURL = try await FirebaseManager.sendImage(image: image, folderName: "folder")
+//                                        print("アップロード成功:", imageURL)
+//                                        
+//                                              if willPostPublic {
+//                                                // 公開：publiccolor を入れて保存 → publicPhotos 側へ
+//                                                let hex = colorForToday(date: Date(), uid: uid).hex
+//                                                let newPost = IMagepost(URLString: imageURL.absoluteString, publiccolor: hex)
+//                                                try FirebaseManager.addItem(item: newPost, uid: uid)
+//                                              } else {
+//                                                // 非公開：publiccolor は nil → users/{uid}/posts 側へ
+//                                                let newPost = IMagepost(URLString: imageURL.absoluteString, publiccolor: nil)
+//                                                try FirebaseManager.addItem(item: newPost, uid: uid)
+//                                              }
                                         let imageURL = try await FirebaseManager.sendImage(image: image, folderName: "folder")
                                         print("アップロード成功:", imageURL)
-                                        
-                                              if willPostPublic {
-                                                // 公開：publiccolor を入れて保存 → publicPhotos 側へ
-                                                let hex = colorForToday(date: Date(), uid: uid).hex
-                                                let newPost = IMagepost(URLString: imageURL.absoluteString, publiccolor: hex)
-                                                try FirebaseManager.addItem(item: newPost, uid: uid)
-                                              } else {
-                                                // 非公開：publiccolor は nil → users/{uid}/posts 側へ
-                                                let newPost = IMagepost(URLString: imageURL.absoluteString, publiccolor: nil)
-                                                try FirebaseManager.addItem(item: newPost, uid: uid)
-                                              }
-                                        
+
+                                        let hex = colorForToday(date: Date(), uid: uid).hex
+                                        let newPost = IMagepost(URLString: imageURL.absoluteString, publiccolor: hex)
+                                        try FirebaseManager.addItem(item: newPost, uid: uid, isPublic: willPostPublic)
                                         
                                     } catch {
                                         print("アップロード失敗:", error)

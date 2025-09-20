@@ -31,9 +31,9 @@ enum FirebaseManager {
         return downloadUrl
     }
 
-    static func addItem(item: IMagepost, uid: String) throws {
+    static func addItem(item: IMagepost, uid: String, isPublic: Bool) throws {
         print(uid)
-        if item.publiccolor == nil{
+        if isPublic == false{
             try db.collection("users").document(uid).collection("posts").addDocument(from: item)
         } else {
             try db.collection("publicPhotos").addDocument(from: item)
