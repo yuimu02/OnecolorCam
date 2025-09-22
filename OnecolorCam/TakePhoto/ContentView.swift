@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import ColorfulX
 
 struct ContentView: View {
     @State private var currentTab: Tab = .home

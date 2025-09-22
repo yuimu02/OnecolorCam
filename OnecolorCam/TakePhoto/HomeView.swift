@@ -4,6 +4,7 @@ import SwiftUI
 import ColorfulX
 import AppleSignInFirebase
 import FirebaseFirestore
+import ColorExtensions
 
 enum Tab {
     case home
@@ -37,6 +38,7 @@ struct HomeView: View {
     @State private var postsForSelectedDay: [IMagepost] = []
     @State private var startIndex: Int = 0
     @State private var pagerPayload: ImagePagerPayload?
+    @State private var showAlbum = false
     
     
     private var days: [Int?] {
@@ -84,6 +86,7 @@ struct HomeView: View {
                     .ignoresSafeArea()
                 
                 VStack {
+                    
                     HStack(spacing: 12) {
                         Text(viewModel.formattedDate)
                             .font(.system(size: 20))
@@ -266,6 +269,25 @@ struct HomeView: View {
                     await loadAllImagesMixed()
                 }
             }
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    NavigationLink {
+                        // アルバムに全画像を渡して 0 枚目から表示
+                        AlbumView(posts: images, index: 0)
+                    } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: "photo.on.rectangle.angled")
+                                .font(.system(size: 22, weight: .semibold))
+                        }
+                        .padding(.top, 8)       // 上に余白
+                        .padding(.trailing, 8)
+                    }
+                    // テーマに合わせて色を変えたい場合はここで
+                    .tint(.black)
+                    .disabled(images.isEmpty) // 画像がないときは無効化（任意）
+                }
+            }
+            .navigationBarTitleDisplayMode(.inline)
         }
     }
     
@@ -345,9 +367,20 @@ struct ImageDetailPagerSheet: View {
                         } else {
                             Text("画像がありません")
                         }
-                        Text(Self.df.string(from: posts[i].created))
-                            .font(.title3).bold()
-                            .padding(.top,50)
+                        
+                        HStack(spacing: 12) {
+                            Text(Self.df.string(from: posts[i].created))
+                                .font(.title3).bold()
+                                .padding(.top, 50)
+
+                            if let hex = posts[i].publiccolor {
+                                Circle()
+                                    .fill(hex.color)
+                                    .frame(width: 17, height: 17)
+                                    .padding(.top, 50)
+                            }
+                        }
+
                     }
                     .padding(.horizontal)
                     .tag(i)
