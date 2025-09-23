@@ -40,8 +40,6 @@ enum FirebaseManager {
 //        }
     }
 
-    
-
     static func deleteItem(id: String, uid: String) throws {
         try db.collection("users").document(uid).collection("posts").document(id).delete()
     }
@@ -82,5 +80,11 @@ enum FirebaseManager {
             .getDocuments()
         
         return try snap.documents.map { try $0.data(as: IMagepost.self) }
+    }
+    
+    static func addFriend(uid: String, friendUid: String) async throws {
+        try await db.collection("users").document(uid).updateData([
+            "friends": FieldValue.arrayUnion([friendUid])
+        ])
     }
 }
