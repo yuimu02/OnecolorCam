@@ -31,13 +31,13 @@ enum FirebaseManager {
         return downloadUrl
     }
 
-    static func addItem(item: IMagepost, uid: String, isPublic: Bool) throws {
+    static func addItem(item: IMagepost, uid: String) throws {
         print(uid)
-        if isPublic == false{
+//        if isPublic == false{
             try db.collection("users").document(uid).collection("posts").addDocument(from: item)
-        } else {
-            try db.collection("publicPhotos").addDocument(from: item)
-        }
+//        } else {
+//            try db.collection("publicPhotos").addDocument(from: item)
+//        }
     }
 
     
@@ -54,16 +54,33 @@ enum FirebaseManager {
         return try await db.collection("users").document(uid).collection("posts").document(id).getDocument(as: IMagepost.self)
     }
 
-    static func getAllPrivateItems(uid: String) async throws -> [IMagepost] {
+    static func getAllMyItems(uid: String) async throws -> [IMagepost] {
         return try await db.collection("users").document(uid).collection("posts").getDocuments().documents.map { try $0.data(as: IMagepost.self) }
     }
     
-    static func getAllPublicItems(uid: String = "") async throws -> [IMagepost] {
-        try await db.collection("publicPhotos")
-            .order(by: "created", descending: true)   // 任意（新しい順）
-            .getDocuments()
-            .documents
+    static func getAllPublicItems() async throws -> [IMagepost] {
+        let snap = try await db.collectionGroup("posts").getDocuments()
+        return try snap.documents
             .map { try $0.data(as: IMagepost.self) }
+            .filter { $0.isPublic == true }
+            .sorted { $0.created < $1.created }
     }
-    
+//    static func getAllPublicItems() async throws -> [IMagepost] {
+//        let snap = try await db.collectionGroup("posts")
+//            .whereField("isPublic", isEqualTo: true)   // 公開のみ
+//            .order(by: "created", descending: true)   // 新しい順
+//            .getDocuments()
+//
+//        return try snap.documents.map { try $0.data(as: IMagepost.self) }
+//    }
+    static func getAllMyPublicItems() async throws -> [IMagepost] {
+        let snap = try await db.collection("users")
+            .document(uid)
+            .collection("posts")
+            .whereField("isPublic", isEqualTo: true)  // 公開のみ
+            .order(by: "created", descending: true)   // 新しい順
+            .getDocuments()
+        
+        return try snap.documents.map { try $0.data(as: IMagepost.self) }
+    }
 }

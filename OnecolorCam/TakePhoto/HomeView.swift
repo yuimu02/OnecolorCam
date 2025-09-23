@@ -17,6 +17,7 @@ struct IMagepost: Codable {
     var created:Date = Date()
     var URLString:String
     var publiccolor: String?
+    var isPublic: Bool?
 }
 
 struct ImagePagerPayload: Identifiable {
@@ -302,20 +303,11 @@ struct HomeView: View {
     func loadAllImagesMixed() async {
         guard let uid = AuthManager.shared.user?.uid else { return }
         do {
-            async let priv = FirebaseManager.getAllPrivateItems(uid: uid)
-            async let pub  = FirebaseManager.getAllPublicItems()
-            let (privateItems, publicItems) = try await (priv, pub)
-            
-            let merged = privateItems + publicItems
-            
-            // 重複除去（id があれば id を、無ければ URLString をキーに）
-            var seen = Set<String>()
-            let unique = merged.filter { p in
-                let key = p.id ?? p.URLString
-                return seen.insert(key).inserted
-            }
-            
-            self.images = unique.sorted { $0.created > $1.created }
+            let uid = AuthManager.shared.user?.uid ?? ""
+            let privateItems = try await FirebaseManager.getAllMyItems(uid: uid)
+
+            // 取得したものを新しい順にソートして代入
+            self.images = privateItems.sorted { $0.created > $1.created }
         } catch {
             print("loadAllImagesMixed error:", error)
         }

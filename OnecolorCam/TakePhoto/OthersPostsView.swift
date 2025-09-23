@@ -82,53 +82,53 @@ struct OthersPostsView: View {
                             applyBackground(for: newValue)
                         }
                     }
-
-                    // Bottom nav
-                    HStack(spacing: 34) {
-                        Button { tab = .home } label: {
-                            Image(systemName: "house")
-                                .font(.system(size: 30))
-                                .foregroundColor(.black)
-                                .frame(width: 80, height: 80)
-                                .background(
-                                    Circle()
-                                        .fill(Color.white.opacity(0.3))
-                                        .shadow(color: .black.opacity(0.7), radius: 4, x: 0, y: 2)
-                                )
-                                .overlay(Circle().stroke(Color.black, lineWidth: 0.8))
-                        }
-                        .offset(y: -10)
-
-                        Button { tab = .camera } label: {
-                            Image(systemName: "camera")
-                                .font(.system(size: 30))
-                                .foregroundColor(.black)
-                                .frame(width: 80, height: 80)
-                                .background(
-                                    Circle()
-                                        .fill(Color.white.opacity(0.3))
-                                        .shadow(color: .black.opacity(0.7), radius: 4, x: 0, y: 2)
-                                )
-                                .overlay(Circle().stroke(Color.black, lineWidth: 0.8))
-                        }
-                        .offset(y: 10)
-
-                        Button {} label: {
-                            Image(systemName: "person.3.fill")
-                                .font(.system(size: 25))
-                                .foregroundColor(.black)
-                                .frame(width: 80, height: 80)
-                                .background(
-                                    Circle()
-                                        .fill(Color.white.opacity(0.3))
-                                        .shadow(color: .black.opacity(0.7), radius: 4, x: 0, y: 2)
-                                )
-                                .overlay(Circle().stroke(Color.black, lineWidth: 1.7))
-                        }
-                        .offset(y: -10)
-                    }
-                    .padding()
                 }
+                // Bottom nav
+                HStack(spacing: 34) {
+                    Button { tab = .home } label: {
+                        Image(systemName: "house")
+                            .font(.system(size: 30))
+                            .foregroundColor(.black)
+                            .frame(width: 80, height: 80)
+                            .background(
+                                Circle()
+                                    .fill(Color.white.opacity(0.3))
+                                    .shadow(color: .black.opacity(0.7), radius: 4, x: 0, y: 2)
+                            )
+                            .overlay(Circle().stroke(Color.black, lineWidth: 0.8))
+                    }
+                    .offset(y: -10)
+
+                    Button { tab = .camera } label: {
+                        Image(systemName: "camera")
+                            .font(.system(size: 30))
+                            .foregroundColor(.black)
+                            .frame(width: 80, height: 80)
+                            .background(
+                                Circle()
+                                    .fill(Color.white.opacity(0.3))
+                                    .shadow(color: .black.opacity(0.7), radius: 4, x: 0, y: 2)
+                            )
+                            .overlay(Circle().stroke(Color.black, lineWidth: 0.8))
+                    }
+                    .offset(y: 10)
+
+                    Button {} label: {
+                        Image(systemName: "person.3.fill")
+                            .font(.system(size: 25))
+                            .foregroundColor(.black)
+                            .frame(width: 80, height: 80)
+                            .background(
+                                Circle()
+                                    .fill(Color.white.opacity(0.3))
+                                    .shadow(color: .black.opacity(0.7), radius: 4, x: 0, y: 2)
+                            )
+                            .overlay(Circle().stroke(Color.black, lineWidth: 1.7))
+                    }
+                    .offset(y: -10)
+                }
+                .padding()
+                
             }
             .padding()
         }
@@ -147,10 +147,19 @@ struct OthersPostsView: View {
     @MainActor
     private func loadPublic() async {
         do {
-            let uid = AuthManager.shared.user?.uid ?? "" // 署名に合わせて一応渡す
-            let items = try await FirebaseManager.getAllPublicItems(uid: uid)
+            let items = try await FirebaseManager.getAllPublicItems()
 
-            // created の新しい順（Firestoreで orderBy 済みなら不要）
+            // デバッグ出力
+            print("取得件数:", items.count)
+            for (i, item) in items.enumerated() {
+                print("---- \(i) ----")
+                print("id:", item.id ?? "nil")
+                print("created:", item.created)
+                print("URLString:", item.URLString)
+                print("publiccolor:", item.publiccolor ?? "nil")
+                print("isPublic:", item.isPublic ?? false)
+            }
+
             let sorted = items.sorted { $0.created > $1.created }
 
             self.posts = sorted

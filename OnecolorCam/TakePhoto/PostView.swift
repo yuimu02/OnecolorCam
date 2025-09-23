@@ -112,8 +112,8 @@ struct PostView: View {
                                         print("アップロード成功:", imageURL)
 
                                         let hex = colorForToday(date: Date(), uid: uid).hex
-                                        let newPost = IMagepost(URLString: imageURL.absoluteString, publiccolor: hex)
-                                        try FirebaseManager.addItem(item: newPost, uid: uid, isPublic: willPostPublic)
+                                        let newPost = IMagepost(URLString: imageURL.absoluteString, publiccolor: hex, isPublic: willPostPublic)
+                                        try FirebaseManager.addItem(item: newPost, uid: uid)
                                         
                                     } catch {
                                         print("アップロード失敗:", error)
@@ -123,7 +123,7 @@ struct PostView: View {
                     
                     HStack(spacing: 100) {
                         Button {
-                                willPostPublic = false       // ← 公開（publicPhotos）
+                                willPostPublic = false
                                 updateCounter += 1
                             dismiss()
                             tab = .home
