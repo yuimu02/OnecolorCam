@@ -73,7 +73,7 @@ enum FirebaseManager {
 //
 //        return try snap.documents.map { try $0.data(as: IMagepost.self) }
 //    }
-    static func getAllMyPublicItems() async throws -> [IMagepost] {
+    static func getAllMyPublicItems(uid: String) async throws -> [IMagepost] {
         let snap = try await db.collection("users")
             .document(uid)
             .collection("posts")

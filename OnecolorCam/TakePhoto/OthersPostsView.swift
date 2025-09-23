@@ -9,6 +9,7 @@ import SwiftUI
 import ColorfulX
 import ColorExtensions
 import AppleSignInFirebase
+import FirebaseAuth
 
 struct OthersPostsView: View {
     @StateObject private var viewModel = HomeViewModel()
@@ -19,6 +20,13 @@ struct OthersPostsView: View {
 
     @Binding var tab: Tab
 
+    private enum Source: String, CaseIterable, Identifiable {
+        case allPublic = "All"
+        case myPublic  = "Mine"
+        var id: String { rawValue }
+    }
+    @State private var source: Source = .allPublic
+    
     var body: some View {
         ZStack {
             Color.white.ignoresSafeArea()
@@ -26,11 +34,25 @@ struct OthersPostsView: View {
                 .ignoresSafeArea()
                 .opacity(0.7)
 
+            
             VStack {
+
+                    // ▼ 上部トグル（セグメント）
+                    Picker("", selection: $source) {
+                        ForEach(Source.allCases) { s in
+                            Text(s.rawValue)
+                                .tag(s)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                    .padding(.horizontal)
+                    .onChange(of: source) { _ in
+                        Task { await loadPublic() }
+                    }
                 if posts.isEmpty {
-                    Text("No public posts yet")
+                    Text(emptyMessage)
                         .font(.headline)
-                        .padding()
+                        .padding(.top, 24)
                 } else {
                     VStack(spacing: 16) {
                         TabView(selection: $index) {
@@ -140,6 +162,12 @@ struct OthersPostsView: View {
         }
         .refreshable {
             await loadPublic()
+        }
+    }
+    private var emptyMessage: String {
+        switch source {
+        case .allPublic: return "No public posts yet"
+        case .myPublic:  return "No public posts of yours yet"
         }
     }
 
