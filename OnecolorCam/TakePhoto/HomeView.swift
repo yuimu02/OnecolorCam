@@ -79,6 +79,31 @@ struct HomeView: View {
             .sorted { $0.created > $1.created }
     }
     
+    private func findPostsOneMonthAgo() -> [IMagepost] {
+        guard let targetDate = Calendar.current.date(byAdding: .month, value: -1, to: Date()) else {
+            return []
+        }
+        return images
+            .filter { Calendar.current.isDate($0.created, inSameDayAs: targetDate) }
+            .sorted { $0.created > $1.created }
+    }
+    
+    private func isPosted(on date: Date) -> Bool {
+        images.contains { Calendar.current.isDate($0.created, inSameDayAs: date) }
+    }
+
+    private func computeStreak(endingAt endDate: Date = Date()) -> Int {
+        var streak = 0
+        var day = endDate
+        while isPosted(on: day) {
+            streak += 1
+            guard let prev = Calendar.current.date(byAdding: .day, value: -1, to: day) else { break }
+            day = prev
+        }
+        return streak
+    }
+    
+    
     var body: some View {
         NavigationStack {
             ZStack {
@@ -126,26 +151,26 @@ struct HomeView: View {
                                     if let first = posts.first, let url = URL(string: first.URLString) {
                                         // If a URL exists, display the image
                                         AsyncImage(url: url) { image in
-//                                            image
-//                                                .resizable()
-//                                                .aspectRatio(1, contentMode: .fit)
-//                                                .clipShape(RoundedRectangle(cornerRadius: 4))
-//                                                .clipped()
-//                                                .onTapGesture {
-//                                                    postsForSelectedDay = posts
-//                                                    startIndex = 0
-//                                                    isShowingPager = true
-//                                                }
+                                            //                                            image
+                                            //                                                .resizable()
+                                            //                                                .aspectRatio(1, contentMode: .fit)
+                                            //                                                .clipShape(RoundedRectangle(cornerRadius: 4))
+                                            //                                                .clipped()
+                                            //                                                .onTapGesture {
+                                            //                                                    postsForSelectedDay = posts
+                                            //                                                    startIndex = 0
+                                            //                                                    isShowingPager = true
+                                            //                                                }
                                             ZStack(alignment: .topLeading) {
-                                                        image
-                                                            .resizable()
-                                                            .aspectRatio(1, contentMode: .fit)
-                                                        DateBadge(day: day)
-                                                    }
-                                                    .clipShape(RoundedRectangle(cornerRadius: 4))
-                                                    .onTapGesture {
-                                                        pagerPayload = .init(posts: posts, startIndex: 0)
-                                                    }
+                                                image
+                                                    .resizable()
+                                                    .aspectRatio(1, contentMode: .fit)
+                                                DateBadge(day: day)
+                                            }
+                                            .clipShape(RoundedRectangle(cornerRadius: 4))
+                                            .onTapGesture {
+                                                pagerPayload = .init(posts: posts, startIndex: 0)
+                                            }
                                         } placeholder: {
                                             ProgressView() // Show a loading indicator
                                         }
@@ -165,34 +190,95 @@ struct HomeView: View {
                     }
                     Spacer()
                     
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        LazyHStack(spacing: 0) {
-                            ForEach(images.sorted { $0.created > $1.created }, id: \.id) { post in
-                                if let url = URL(string: post.URLString) {
-                                    AsyncImage(url: url) { image in
-                                        image
-                                            .resizable()
-                                            .aspectRatio(1, contentMode: .fill)
-                                            .frame(width: 150, height: 150)
-                                            .clipped()
-                                            .cornerRadius(12)
-                                            .shadow(radius: 4)
-                                            .padding(.horizontal, 10)
-                                            .onTapGesture {
-                                                pagerPayload = .init(posts: [post], startIndex: 0)
-                                            }
-                                    } placeholder: {
-                                        ProgressView()
-                                            .frame(width: 120, height: 120)
+                    //                    ScrollView(.horizontal, showsIndicators: false) {
+                    //                        LazyHStack(spacing: 0) {
+                    //                            ForEach(images.sorted { $0.created > $1.created }, id: \.id) { post in
+                    //                                if let url = URL(string: post.URLString) {
+                    //                                    AsyncImage(url: url) { image in
+                    //                                        image
+                    //                                            .resizable()
+                    //                                            .aspectRatio(1, contentMode: .fill)
+                    //                                            .frame(width: 150, height: 150)
+                    //                                            .clipped()
+                    //                                            .cornerRadius(12)
+                    //                                            .shadow(radius: 4)
+                    //                                            .padding(.horizontal, 10)
+                    //                                            .onTapGesture {
+                    //                                                pagerPayload = .init(posts: [post], startIndex: 0)
+                    //                                            }
+                    //                                    } placeholder: {
+                    //                                        ProgressView()
+                    //                                            .frame(width: 120, height: 120)
+                    //                                    }
+                    //                                }
+                    //                            }
+                    //                        }
+                    //                        //                        .padding(.horizontal)
+                    //                    }
+                    //                    .frame(height: 150)
+                    //                    .padding(.horizontal, -16)
+                    //                    .padding(.top, 33)
+                    HStack {
+                    let oneMonthAgoPosts = findPostsOneMonthAgo()
+                    let currentStreak = computeStreak()
+                    
+                    if let post = oneMonthAgoPosts.first,
+                       let url = URL(string: post.URLString) {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("One Month Ago")
+                                .font(.headline)
+                                .foregroundColor(.black)
+                            AsyncImage(url: url) { image in
+                                image
+                                    .resizable()
+                                    .frame(width: 140, height: 140)
+                                    .cornerRadius(12)
+                                    .shadow(radius: 4)
+                                    .onTapGesture {
+                                        // 同日の複数投稿がある場合はPagerで見られる
+                                        pagerPayload = .init(posts: oneMonthAgoPosts, startIndex: 0)
                                     }
-                                }
+                            } placeholder: {
+                                ProgressView()
                             }
                         }
-                        //                        .padding(.horizontal)
+                        .padding(.top, 7)
+                        .padding(.trailing, 35)
+                    } else {
+                        // 未投稿日のフォールバック（任意）
+                        HStack(spacing: 10) {
+                            Image(systemName: "clock")
+                            Text("1ヶ月前の今日は未投稿です")
+                        }
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .padding()
+                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+                        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.black.opacity(0.06), lineWidth: 1))
+                        .padding(.vertical, 10)
+                        .frame(width: 170, height: 140)
+                        .padding(.trailing, 35)
                     }
-                    .frame(height: 150)
-                    .padding(.horizontal, -16)
-                    .padding(.top, 33)
+                        
+                        
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("You’re on a")
+                                .font(.headline)
+                                .foregroundColor(.primary)
+                                .padding(.leading, -13)
+
+                            HStack(alignment: .firstTextBaseline, spacing: 6) {
+                                Text("\(currentStreak)")
+                                    .font(.system(size: 40, weight: .bold))
+                                    .monospacedDigit()
+
+                                Text("day run 🔥")
+                                    .font(.headline)
+                                    .foregroundColor(.primary)
+                            }
+                        }
+                }
+
                     
                     // Bottom navigation buttons
                     HStack(spacing: 34) {
@@ -252,7 +338,8 @@ struct HomeView: View {
                         }
                         .offset(y: -10)
                     }
-                    .padding(.vertical, 30)
+                    .padding(.top, 10)
+                    .padding(.bottom, 30)
                 }
                 .padding()
             }

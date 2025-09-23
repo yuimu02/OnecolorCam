@@ -63,7 +63,7 @@ enum FirebaseManager {
         return try snap.documents
             .map { try $0.data(as: IMagepost.self) }
             .filter { $0.isPublic == true }
-            .sorted { $0.created < $1.created }
+            .sorted { $0.created > $1.created }
     }
 //    static func getAllPublicItems() async throws -> [IMagepost] {
 //        let snap = try await db.collectionGroup("posts")
