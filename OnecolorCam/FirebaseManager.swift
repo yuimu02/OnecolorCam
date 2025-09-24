@@ -56,13 +56,6 @@ enum FirebaseManager {
         return try await db.collection("users").document(uid).collection("posts").getDocuments().documents.map { try $0.data(as: IMagepost.self) }
     }
     
-//    static func getAllPublicItems() async throws -> [IMagepost] {
-//        let snap = try await db.collectionGroup("posts").getDocuments()
-//        return try snap.documents
-//            .map { try $0.data(as: IMagepost.self) }
-//            .filter { $0.isPublic == true }
-//            .sorted { $0.created > $1.created }
-//    }
     static func getAllPublicItems(
         for uid: String,
         includePrivate: Bool = false,
@@ -100,14 +93,7 @@ enum FirebaseManager {
         all.sort { $0.created > $1.created }
         return all
     }
-//    static func getAllPublicItems() async throws -> [IMagepost] {
-//        let snap = try await db.collectionGroup("posts")
-//            .whereField("isPublic", isEqualTo: true)   // 公開のみ
-//            .order(by: "created", descending: true)   // 新しい順
-//            .getDocuments()
-//
-//        return try snap.documents.map { try $0.data(as: IMagepost.self) }
-//    }
+    
     static func getAllMyPublicItems(uid: String) async throws -> [IMagepost] {
         let snap = try await db.collection("users")
             .document(uid)

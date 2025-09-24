@@ -23,7 +23,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 @main
 struct OnecolorCamApp: App {
     init() {
-        NotificationService.shared.configure() 
+        NotificationService.shared.configure()
     }
     
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
@@ -31,9 +31,6 @@ struct OnecolorCamApp: App {
     var body: some Scene {
         WindowGroup {
             AuthView()
-//            TestCameraView()
-//            PostView()
-//            TakePhotoView()
                 .environment(AuthManager.shared)
                 .onOpenURL { url in
                     if let uid = AuthManager.shared.user?.uid {
