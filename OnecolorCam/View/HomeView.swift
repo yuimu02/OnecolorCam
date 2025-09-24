@@ -117,7 +117,7 @@ struct HomeView: View {
                     
                     HStack(spacing: 12) {
                         Text(viewModel.formattedDate)
-                            .font(.system(size: 20))
+                            .font(.system(size: 21))
                             .foregroundColor(.black)
                         if let uid = AuthManager.shared.user?.uid {
                             Circle()
@@ -125,55 +125,12 @@ struct HomeView: View {
                                 .frame(width: 17, height: 17)
                         }
                     }
-                    .padding(.top, 10)
+                    .padding(.top, 30)
                     .padding(.bottom, 14)
                     .padding()
                     
-                    HStack(spacing: 2) {
-                        let weekDays = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]
-                        ForEach(weekDays, id: \.self) { day in
-                            Text(day)
-                                .font(.system(size: 14, weight: .bold))
-                                .foregroundColor(.black)
-                                .frame(maxWidth: .infinity)
-                        }
-                    }
-                    
-                    // MARK: - Modified Calendar Grid
-                    LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 2) {
-                        ForEach(days.indices, id: \.self) { index in
-                            ZStack {
-                                GlassRect()
-                                
-                                if let day = days[index] {
-                                    let posts = findImagePost(for: day)
-                                    if let first = posts.first, let url = URL(string: first.URLString) {
-                                        AsyncImage(url: url) { image in
-                                            ZStack(alignment: .topLeading) {
-                                                image
-                                                    .resizable()
-                                                    .aspectRatio(1, contentMode: .fit)
-                                                DateBadge(day: day)
-                                            }
-                                            .clipShape(RoundedRectangle(cornerRadius: 4))
-                                            .onTapGesture {
-                                                pagerPayload = .init(posts: posts, startIndex: 0)
-                                            }
-                                        } placeholder: {
-                                            ProgressView()
-                                        }
-                                        .clipped() // Prevents the image from overflowing its frame
-                                        .clipShape(RoundedRectangle(cornerRadius: 4))
-                                        
-                                    } else {
-                                        Text("\(day)")
-                                            .foregroundColor(.black)
-                                            .font(.system(size: 14, weight: .bold))
-                                    }
-                                }
-                            }
-                            .padding(.vertical, 3)
-                        }
+                    MonthPager(images: images) { posts in
+                        pagerPayload = .init(posts: posts, startIndex: 0)
                     }
                     Spacer()
                     HStack {
