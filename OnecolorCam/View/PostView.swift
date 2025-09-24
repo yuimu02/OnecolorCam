@@ -39,22 +39,19 @@ struct PostView: View {
                     .ignoresSafeArea()
                     .opacity(0.7)
                 VStack {
-                
-                HStack(spacing: 12) {
-                    Text(viewModel.formattedDate)
-                        .font(.system(size: 20))
-                        .foregroundColor(.black)
-                    if let uid = AuthManager.shared.user?.uid {
-                        Circle()
-                            .fill(colorForToday(date: Date(), uid: uid)) // 今日の色
-                            .frame(width: 17, height: 17)                 // 丸の大きさ
-//                                .overlay(
-//                                    Circle().stroke(Color.black.opacity(0.1), lineWidth: 1)
-//                                )
+                    
+                    HStack(spacing: 12) {
+                        Text(viewModel.formattedDate)
+                            .font(.system(size: 20))
+                            .foregroundColor(.black)
+                        if let uid = AuthManager.shared.user?.uid {
+                            Circle()
+                                .fill(colorForToday(date: Date(), uid: uid))
+                                .frame(width: 17, height: 17)
+                        }
                     }
-                }
-                .padding()
-                
+                    .padding()
+                    
                     Button {
                         dismiss()
                     } label: {
@@ -89,42 +86,26 @@ struct PostView: View {
                         self.image = UIImage(data: data!)!
                         Task {
                             guard let uid = AuthManager.shared.user?.uid else { return }
-                                    
-                                    // 表示中の画像をそのまま加工（アルファを削除）
-//                                    let newImage = removeAlpha(image)
-                                    
-                                    do {
-                                        // Firebaseにアップロード
-//                                        let imageURL = try await FirebaseManager.sendImage(image: image, folderName: "folder")
-//                                        print("アップロード成功:", imageURL)
-//                                        
-//                                              if willPostPublic {
-//                                                // 公開：publiccolor を入れて保存 → publicPhotos 側へ
-//                                                let hex = colorForToday(date: Date(), uid: uid).hex
-//                                                let newPost = IMagepost(URLString: imageURL.absoluteString, publiccolor: hex)
-//                                                try FirebaseManager.addItem(item: newPost, uid: uid)
-//                                              } else {
-//                                                // 非公開：publiccolor は nil → users/{uid}/posts 側へ
-//                                                let newPost = IMagepost(URLString: imageURL.absoluteString, publiccolor: nil)
-//                                                try FirebaseManager.addItem(item: newPost, uid: uid)
-//                                              }
-                                        let imageURL = try await FirebaseManager.sendImage(image: image, folderName: "folder")
-                                        print("アップロード成功:", imageURL)
-
-                                        let hex = colorForToday(date: Date(), uid: uid).hex
-                                        let newPost = IMagepost(URLString: imageURL.absoluteString, publiccolor: hex, isPublic: willPostPublic)
-                                        try FirebaseManager.addItem(item: newPost, uid: uid)
-                                        
-                                    } catch {
-                                        print("アップロード失敗:", error)
-                                    }
+                            
+                            
+                            do {
+                                let imageURL = try await FirebaseManager.sendImage(image: image, folderName: "folder")
+                                print("アップロード成功:", imageURL)
+                                
+                                let hex = colorForToday(date: Date(), uid: uid).hex
+                                let newPost = IMagepost(URLString: imageURL.absoluteString, publiccolor: hex, isPublic: willPostPublic)
+                                try FirebaseManager.addItem(item: newPost, uid: uid)
+                                
+                            } catch {
+                                print("アップロード失敗:", error)
+                            }
                         }
                     }
                     
                     HStack(spacing: 100) {
                         Button {
-                                willPostPublic = false
-                                updateCounter += 1
+                            willPostPublic = false
+                            updateCounter += 1
                             dismiss()
                             tab = .home
                         } label: {
@@ -175,11 +156,11 @@ struct PostView: View {
     
     
     func getTodayHue() -> Float {
-            guard let uid = AuthManager.shared.user?.uid else { return 0.0 }
-            let todaysColor = colorForToday(date: Date(), uid: uid)
-            let hsv = todaysColor.toHSV()
-            return hsv.h
-        }
+        guard let uid = AuthManager.shared.user?.uid else { return 0.0 }
+        let todaysColor = colorForToday(date: Date(), uid: uid)
+        let hsv = todaysColor.toHSV()
+        return hsv.h
+    }
     func removeAlpha(_ image: UIImage) -> UIImage {
         let format = UIGraphicsImageRendererFormat()
         format.scale = image.scale
@@ -191,9 +172,8 @@ struct PostView: View {
             context.cgContext.setFillColor(UIColor.white.cgColor)
             context.cgContext.fill(CGRect(origin: .zero, size: image.size))
         }
-    }
-    // UIImageのアルファチャンネルを削除するヘルパー関数
-
+    }// UIImageのアルファチャンネルを削除するヘルパー関数
+    
 }
 
 extension Color {

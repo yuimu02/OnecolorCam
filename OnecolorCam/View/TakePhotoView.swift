@@ -14,8 +14,6 @@ import AppleSignInFirebase
             let src = self.fixedOrientation()
             let w = src.size.width, h = src.size.height
             let side = min(w, h)
-//            let x = (w - side) / 2.0
-//            let y = (h - side) / 2.0
             let x: CGFloat = 0
             let y: CGFloat = 0
 
@@ -60,11 +58,8 @@ struct TakePhotoView: View {
                         .foregroundColor(.black)
                     if let uid = AuthManager.shared.user?.uid {
                         Circle()
-                            .fill(colorForToday(date: Date(), uid: uid)) // 今日の色
-                            .frame(width: 17, height: 17)                 // 丸の大きさ
-                        //                                .overlay(
-                        //                                    Circle().stroke(Color.black.opacity(0.1), lineWidth: 1)
-                        //                                )
+                            .fill(colorForToday(date: Date(), uid: uid))
+                            .frame(width: 17, height: 17)
                     }
                 }
                 .padding(.top, 45)
@@ -78,8 +73,8 @@ struct TakePhotoView: View {
                         capturedImage = uiimage.croppedToSquare()
                         isShowingPostView = true
                     }
-                    .aspectRatio(1, contentMode: .fit) // 正方形をここで担保
-                    .frame(width: width)// 高さは比率から決まるので指定しない
+                    .aspectRatio(1, contentMode: .fit)
+                    .frame(width: width)
                     .cornerRadius(12)
                     .compositingGroup()
                     .frame(maxWidth: .infinity, alignment: .center)
@@ -112,12 +107,12 @@ struct TakePhotoView: View {
                             .frame(width: 80, height: 80)
                             .background(
                                 Circle()
-                                    .fill(Color.white.opacity(0.3)) // 背景も丸く
+                                    .fill(Color.white.opacity(0.3))
                                     .shadow(color: .black.opacity(0.7), radius: 4, x: 0, y: 2)
                             )
                             .overlay(
                                 Circle()
-                                    .stroke(Color.black, lineWidth: 0.8) // 黒い縁
+                                    .stroke(Color.black, lineWidth: 0.8)
                             )
                     }
                     .offset(y: -10)
@@ -130,12 +125,12 @@ struct TakePhotoView: View {
                             .frame(width: 80, height: 80)
                             .background(
                                 Circle()
-                                    .fill(Color.white.opacity(0.3)) // 背景も丸く
+                                    .fill(Color.white.opacity(0.3))
                                     .shadow(color: .black.opacity(0.7), radius: 4, x: 0, y: 2)
                             )
                             .overlay(
                                 Circle()
-                                    .stroke(Color.black, lineWidth: 1.7) // 黒い縁
+                                    .stroke(Color.black, lineWidth: 1.7)
                             )
                     }
                     .offset(y: 10)
@@ -149,12 +144,12 @@ struct TakePhotoView: View {
                             .frame(width: 80, height: 80)
                             .background(
                                 Circle()
-                                    .fill(Color.white.opacity(0.3)) // 背景も丸く
+                                    .fill(Color.white.opacity(0.3))
                                     .shadow(color: .black.opacity(0.7), radius: 4, x: 0, y: 2)
                             )
                             .overlay(
                                 Circle()
-                                    .stroke(Color.black, lineWidth: 0.8) // 黒い縁
+                                    .stroke(Color.black, lineWidth: 0.8)
                             )
                     }
                     .offset(y: -10)
@@ -170,11 +165,6 @@ struct TakePhotoView: View {
                 EmptyView()
             }
         }
-//        .onChange(of: isShowingPostView) { newValue in
-//            if !newValue {
-//                capturedImage = nil       // 戻ってきたときだけリセット
-//            }
-//        }
     }
 }
 }

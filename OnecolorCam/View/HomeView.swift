@@ -46,7 +46,7 @@ struct HomeView: View {
     
     private var days: [Int?] {
         var calendar = Calendar(identifier: .gregorian)
-        calendar.firstWeekday = 1 // Start on Sunday
+        calendar.firstWeekday = 1
         
         let components = DateComponents(year: year, month: month, day: 1)
         guard let firstDay = calendar.date(from: components),
@@ -93,7 +93,7 @@ struct HomeView: View {
     private func isPosted(on date: Date) -> Bool {
         images.contains { Calendar.current.isDate($0.created, inSameDayAs: date) }
     }
-
+    
     private func computeStreak(endingAt endDate: Date = Date()) -> Int {
         var streak = 0
         var day = endDate
@@ -121,11 +121,8 @@ struct HomeView: View {
                             .foregroundColor(.black)
                         if let uid = AuthManager.shared.user?.uid {
                             Circle()
-                                .fill(colorForToday(date: Date(), uid: uid)) // 今日の色
-                                .frame(width: 17, height: 17)                 // 丸の大きさ
-                            //                                .overlay(
-                            //                                    Circle().stroke(Color.black.opacity(0.1), lineWidth: 1)
-                            //                                )
+                                .fill(colorForToday(date: Date(), uid: uid))
+                                .frame(width: 17, height: 17)
                         }
                     }
                     .padding(.top, 10)
@@ -151,18 +148,7 @@ struct HomeView: View {
                                 if let day = days[index] {
                                     let posts = findImagePost(for: day)
                                     if let first = posts.first, let url = URL(string: first.URLString) {
-                                        // If a URL exists, display the image
                                         AsyncImage(url: url) { image in
-                                            //                                            image
-                                            //                                                .resizable()
-                                            //                                                .aspectRatio(1, contentMode: .fit)
-                                            //                                                .clipShape(RoundedRectangle(cornerRadius: 4))
-                                            //                                                .clipped()
-                                            //                                                .onTapGesture {
-                                            //                                                    postsForSelectedDay = posts
-                                            //                                                    startIndex = 0
-                                            //                                                    isShowingPager = true
-                                            //                                                }
                                             ZStack(alignment: .topLeading) {
                                                 image
                                                     .resizable()
@@ -174,13 +160,12 @@ struct HomeView: View {
                                                 pagerPayload = .init(posts: posts, startIndex: 0)
                                             }
                                         } placeholder: {
-                                            ProgressView() // Show a loading indicator
+                                            ProgressView()
                                         }
                                         .clipped() // Prevents the image from overflowing its frame
                                         .clipShape(RoundedRectangle(cornerRadius: 4))
                                         
                                     } else {
-                                        // If no image, display the day number
                                         Text("\(day)")
                                             .foregroundColor(.black)
                                             .font(.system(size: 14, weight: .bold))
@@ -191,76 +176,45 @@ struct HomeView: View {
                         }
                     }
                     Spacer()
-                    
-                    //                    ScrollView(.horizontal, showsIndicators: false) {
-                    //                        LazyHStack(spacing: 0) {
-                    //                            ForEach(images.sorted { $0.created > $1.created }, id: \.id) { post in
-                    //                                if let url = URL(string: post.URLString) {
-                    //                                    AsyncImage(url: url) { image in
-                    //                                        image
-                    //                                            .resizable()
-                    //                                            .aspectRatio(1, contentMode: .fill)
-                    //                                            .frame(width: 150, height: 150)
-                    //                                            .clipped()
-                    //                                            .cornerRadius(12)
-                    //                                            .shadow(radius: 4)
-                    //                                            .padding(.horizontal, 10)
-                    //                                            .onTapGesture {
-                    //                                                pagerPayload = .init(posts: [post], startIndex: 0)
-                    //                                            }
-                    //                                    } placeholder: {
-                    //                                        ProgressView()
-                    //                                            .frame(width: 120, height: 120)
-                    //                                    }
-                    //                                }
-                    //                            }
-                    //                        }
-                    //                        //                        .padding(.horizontal)
-                    //                    }
-                    //                    .frame(height: 150)
-                    //                    .padding(.horizontal, -16)
-                    //                    .padding(.top, 33)
                     HStack {
-                    let oneMonthAgoPosts = findPostsOneMonthAgo()
-                    let currentStreak = computeStreak()
-                    
-                    if let post = oneMonthAgoPosts.first,
-                       let url = URL(string: post.URLString) {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("One Month Ago")
-                                .font(.headline)
-                                .foregroundColor(.black)
-                            AsyncImage(url: url) { image in
-                                image
-                                    .resizable()
-                                    .frame(width: 140, height: 140)
-                                    .cornerRadius(12)
-                                    .shadow(radius: 4)
-                                    .onTapGesture {
-                                        // 同日の複数投稿がある場合はPagerで見られる
-                                        pagerPayload = .init(posts: oneMonthAgoPosts, startIndex: 0)
-                                    }
-                            } placeholder: {
-                                ProgressView()
+                        let oneMonthAgoPosts = findPostsOneMonthAgo()
+                        let currentStreak = computeStreak()
+                        
+                        if let post = oneMonthAgoPosts.first,
+                           let url = URL(string: post.URLString) {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("One Month Ago")
+                                    .font(.headline)
+                                    .foregroundColor(.black)
+                                AsyncImage(url: url) { image in
+                                    image
+                                        .resizable()
+                                        .frame(width: 140, height: 140)
+                                        .cornerRadius(12)
+                                        .shadow(radius: 4)
+                                        .onTapGesture {
+                                            pagerPayload = .init(posts: oneMonthAgoPosts, startIndex: 0)
+                                        }
+                                } placeholder: {
+                                    ProgressView()
+                                }
                             }
+                            .padding(.top, 7)
+                            .padding(.trailing, 35)
+                        } else {
+                            HStack(spacing: 10) {
+                                Image(systemName: "clock")
+                                Text("1ヶ月前の今日は未投稿です")
+                            }
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .padding()
+                            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+                            .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.black.opacity(0.06), lineWidth: 1))
+                            .padding(.vertical, 10)
+                            .frame(width: 170, height: 140)
+                            .padding(.trailing, 35)
                         }
-                        .padding(.top, 7)
-                        .padding(.trailing, 35)
-                    } else {
-                        // 未投稿日のフォールバック（任意）
-                        HStack(spacing: 10) {
-                            Image(systemName: "clock")
-                            Text("1ヶ月前の今日は未投稿です")
-                        }
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .padding()
-                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
-                        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.black.opacity(0.06), lineWidth: 1))
-                        .padding(.vertical, 10)
-                        .frame(width: 170, height: 140)
-                        .padding(.trailing, 35)
-                    }
                         
                         
                         VStack(alignment: .leading, spacing: 4) {
@@ -268,21 +222,19 @@ struct HomeView: View {
                                 .font(.headline)
                                 .foregroundColor(.primary)
                                 .padding(.leading, -13)
-
+                            
                             HStack(alignment: .firstTextBaseline, spacing: 6) {
                                 Text("\(currentStreak)")
                                     .font(.system(size: 40, weight: .bold))
                                     .monospacedDigit()
-
+                                
                                 Text("day run 🔥")
                                     .font(.headline)
                                     .foregroundColor(.primary)
                             }
                         }
-                }
-
+                    }
                     
-                    // Bottom navigation buttons
                     HStack(spacing: 34) {
                         Button {
                         } label: {
@@ -354,32 +306,32 @@ struct HomeView: View {
             .sheet(item: $pagerPayload) { payload in
                 ImageDetailPagerSheet(posts: payload.posts, index: payload.startIndex)
             }
-            .sheet(isPresented: $isShowingQRSheet) {   // ← QRコードシート
-                            VStack {
-                                Text("MyQRコード")
-                                    .font(.headline)
-                                    .padding()
-
-                                if let uid = AuthManager.shared.user?.uid,
-                                   let uiimage = generateQR(url: "monoful-ios://user/\(uid)") {
-                                    Image(uiImage: uiimage)
-                                        .resizable()
-                                        .interpolation(.none)
-                                        .scaledToFit()
-                                        .frame(width: 250, height: 250)
-                                        .padding()
-                                        .background(Color.white)
-                                } else {
-                                    ProgressView()
-                                }
-                                Spacer()
-                                
-                                Text("カメラアプリでスキャンしてください")
-                                    .font(.headline)
-                                    .padding()
-                            }
-                            .presentationDetents([.medium, .large])
-                        }
+            .sheet(isPresented: $isShowingQRSheet) {
+                VStack {
+                    Text("MyQRコード")
+                        .font(.headline)
+                        .padding()
+                    
+                    if let uid = AuthManager.shared.user?.uid,
+                       let uiimage = generateQR(url: "monoful-ios://user/\(uid)") {
+                        Image(uiImage: uiimage)
+                            .resizable()
+                            .interpolation(.none)
+                            .scaledToFit()
+                            .frame(width: 250, height: 250)
+                            .padding()
+                            .background(Color.white)
+                    } else {
+                        ProgressView()
+                    }
+                    Spacer()
+                    
+                    Text("カメラアプリでスキャンしてください")
+                        .font(.headline)
+                        .padding()
+                }
+                .presentationDetents([.medium, .large])
+            }
             .refreshable {
                 Task {
                     await loadAllImagesMixed()
@@ -394,34 +346,25 @@ struct HomeView: View {
                             .font(.system(size: 22, weight: .semibold))
                     }
                     .tint(.black)
-                    .padding(.top, 8)       // 上に余白
+                    .padding(.top, 8)
                     .padding(.leading, 8)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     NavigationLink {
-                        // アルバムに全画像を渡して 0 枚目から表示
                         AlbumView(posts: images, index: 0)
                     } label: {
-                            Image(systemName: "photo.on.rectangle.angled")
-                                .font(.system(size: 22, weight: .semibold))
-                        .padding(.top, 8)       // 上に余白
-                        .padding(.trailing, 8)
+                        Image(systemName: "photo.on.rectangle.angled")
+                            .font(.system(size: 22, weight: .semibold))
+                            .padding(.top, 8)
+                            .padding(.trailing, 8)
                     }
-                    // テーマに合わせて色を変えたい場合はここで
                     .tint(.black)
-                    .disabled(images.isEmpty) // 画像がないときは無効化（任意）
+                    .disabled(images.isEmpty)
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
         }
     }
-    
-    //    func loadAllPrivateImages() async throws {
-    //        // Ensure user is not nil before fetching
-    //        guard let uid = AuthManager.shared.user?.uid else { return }
-    //        self.images = try await FirebaseManager.getAllPrivateItems(uid: uid)
-    //    }
-    //}
     
     @MainActor
     func loadAllImagesMixed() async {
@@ -429,7 +372,7 @@ struct HomeView: View {
         do {
             let uid = AuthManager.shared.user?.uid ?? ""
             let privateItems = try await FirebaseManager.getAllMyItems(uid: uid)
-
+            
             // 取得したものを新しい順にソートして代入
             self.images = privateItems.sorted { $0.created > $1.created }
         } catch {
@@ -464,7 +407,7 @@ struct ImageDetailPagerSheet: View {
     @StateObject private var viewModel = HomeViewModel()
     let posts: [IMagepost]
     @State var index: Int   // 開始位置
-
+    
     private static let df: DateFormatter = {
         let f = DateFormatter()
         f.locale = Locale(identifier: "en_US_POSIX")
@@ -476,7 +419,7 @@ struct ImageDetailPagerSheet: View {
     
     var body: some View {
         VStack(spacing: 0) {
-
+            
             TabView(selection: $index) {
                 ForEach(posts.indices, id: \.self) { i in
                     VStack(spacing: 16) {
@@ -499,7 +442,7 @@ struct ImageDetailPagerSheet: View {
                             Text(Self.df.string(from: posts[i].created))
                                 .font(.title3).bold()
                                 .padding(.top, 50)
-
+                            
                             if let hex = posts[i].publiccolor {
                                 Circle()
                                     .fill(hex.color)
@@ -507,7 +450,7 @@ struct ImageDetailPagerSheet: View {
                                     .padding(.top, 50)
                             }
                         }
-
+                        
                     }
                     .padding(.horizontal)
                     .tag(i)
@@ -523,7 +466,7 @@ struct GlassRect: View {
     var body: some View {
         RoundedRectangle(cornerRadius: 6)
             .fill(.ultraThinMaterial)
-            .aspectRatio(1, contentMode: .fit) // This helps ensure the cell is a square
+            .aspectRatio(1, contentMode: .fit)
     }
 }
 

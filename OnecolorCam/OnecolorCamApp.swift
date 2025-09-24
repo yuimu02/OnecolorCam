@@ -23,7 +23,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 @main
 struct OnecolorCamApp: App {
     init() {
-        NotificationService.shared.configure()   // ← 追加：起動時に許可＆毎朝10時を登録
+        NotificationService.shared.configure() 
     }
     
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate

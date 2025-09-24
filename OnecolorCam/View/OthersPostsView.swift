@@ -13,15 +13,15 @@ import FirebaseAuth
 
 struct OthersPostsView: View {
     @StateObject private var viewModel = HomeViewModel()
-
+    
     // 本番は IMagepost をそのまま使う
     @State private var posts: [IMagepost] = []
     @State private var index: Int = 0
-
+    
     @Binding var tab: Tab
-
+    
     private enum Source: String, CaseIterable, Identifiable {
-        case allPublic = "All"
+        case allPublic = "Friend"
         case myPublic  = "Mine"
         var id: String { rawValue }
     }
@@ -33,22 +33,22 @@ struct OthersPostsView: View {
             ColorfulView(color: $viewModel.colors)
                 .ignoresSafeArea()
                 .opacity(0.7)
-
+            
             
             VStack {
-
-                    // ▼ 上部トグル（セグメント）
-                    Picker("", selection: $source) {
-                        ForEach(Source.allCases) { s in
-                            Text(s.rawValue)
-                                .tag(s)
-                        }
+                
+                // ▼ 上部トグル（セグメント）
+                Picker("", selection: $source) {
+                    ForEach(Source.allCases) { s in
+                        Text(s.rawValue)
+                            .tag(s)
                     }
-                    .pickerStyle(.segmented)
-                    .padding(.horizontal)
-                    .onChange(of: source) { _ in
-                        Task { await loadPublic() }
-                    }
+                }
+                .pickerStyle(.segmented)
+                .padding(.horizontal)
+                .onChange(of: source) { _ in
+                    Task { await loadPublic() }
+                }
                 if posts.isEmpty {
                     Text(emptyMessage)
                         .font(.headline)
@@ -120,7 +120,7 @@ struct OthersPostsView: View {
                             .overlay(Circle().stroke(Color.black, lineWidth: 0.8))
                     }
                     .offset(y: -10)
-
+                    
                     Button { tab = .camera } label: {
                         Image(systemName: "camera")
                             .font(.system(size: 30))
@@ -134,7 +134,7 @@ struct OthersPostsView: View {
                             .overlay(Circle().stroke(Color.black, lineWidth: 0.8))
                     }
                     .offset(y: 10)
-
+                    
                     Button {} label: {
                         Image(systemName: "person.3.fill")
                             .font(.system(size: 25))
@@ -170,13 +170,14 @@ struct OthersPostsView: View {
         case .myPublic:  return "No public posts of yours yet"
         }
     }
-
+    
     // MARK: - Data Load
     @MainActor
     private func loadPublic() async {
         do {
-            let items = try await FirebaseManager.getAllPublicItems()
-
+            if let uid = AuthManager.shared.user?.uid {
+            let items = try await FirebaseManager.getAllPublicItems(for: uid)
+            
             // デバッグ出力
             print("取得件数:", items.count)
             for (i, item) in items.enumerated() {
@@ -187,17 +188,21 @@ struct OthersPostsView: View {
                 print("publiccolor:", item.publiccolor ?? "nil")
                 print("isPublic:", item.isPublic ?? false)
             }
-
+            
             let sorted = items.sorted { $0.created > $1.created }
-
+            
             self.posts = sorted
             self.index = 0
             applyBackground(for: 0)
+        } else {
+            print("⚠️ uid が見つかりません（ログインしていません）")
+            self.posts = []
+        }
         } catch {
             print("public load error:", error.localizedDescription)
         }
     }
-
+    
     // MARK: - Background
     private func applyBackground(for idx: Int) {
         guard posts.indices.contains(idx) else { return }
@@ -205,7 +210,7 @@ struct OthersPostsView: View {
         let base: Color = (posts[idx].publiccolor?.color) ?? .gray
         viewModel.colors = makePalette(from: base)
     }
-
+    
     private func makePalette(from base: Color) -> [Color] {
         [
             base,

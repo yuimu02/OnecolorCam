@@ -32,7 +32,6 @@ struct AlbumView: View {
     
     var body: some View {
         ZStack {
-            // 透明にして親ビューの背景を“透かす”
             Color.clear.ignoresSafeArea()
             ScrollView {
                 VStack {
@@ -49,33 +48,32 @@ struct AlbumView: View {
                     }
                     .padding(.horizontal, 12)
                     .padding(.top, 8)
-                LazyVGrid(columns: columns, spacing: 12) {
-                    ForEach(posts.indices, id: \.self) { i in
-                        Button {
-                            // タップした位置から開始
-                            pagerPayload = .init(posts: posts, startIndex: i)
-                        } label: {
-                            if let url = URL(string: posts[i].URLString) {
-                                AsyncImage(url: url) { image in
-                                    image
-                                        .resizable()
-                                        .aspectRatio(1, contentMode: .fill) // 正方形トリミング
-                                } placeholder: {
+                    LazyVGrid(columns: columns, spacing: 12) {
+                        ForEach(posts.indices, id: \.self) { i in
+                            Button {
+                                pagerPayload = .init(posts: posts, startIndex: i)
+                            } label: {
+                                if let url = URL(string: posts[i].URLString) {
+                                    AsyncImage(url: url) { image in
+                                        image
+                                            .resizable()
+                                            .aspectRatio(1, contentMode: .fill) // 正方形トリミング
+                                    } placeholder: {
+                                        Color.gray.opacity(0.15)
+                                    }
+                                } else {
                                     Color.gray.opacity(0.15)
                                 }
-                            } else {
-                                Color.gray.opacity(0.15)
                             }
+                            .buttonStyle(.plain)
+                            .frame(height: 110)
+                            .clipped()
+                            .cornerRadius(12)
+                            .shadow(radius: 4)
                         }
-                        .buttonStyle(.plain)
-                        .frame(height: 110)
-                        .clipped()
-                        .cornerRadius(12)
-                        .shadow(radius: 4)
                     }
+                    .padding(.all, 12)
                 }
-                .padding(.all, 12)
-            }
             }
             .background(.clear)
         }

@@ -16,20 +16,14 @@ struct RootView : View {
         TabView(selection: $currentTab) {
             HomeView(year: year, month: month, tab: $currentTab)
                 .tag(Tab.home)
-
+            
             TakePhotoView(tab: $currentTab)
                 .tag(Tab.camera)
-
+            
             OthersPostsView(tab: $currentTab)
                 .tag(Tab.others)
         }
-        // 既存の見た目のボタンを使いたい場合、純正タブバーは隠してOK
         .toolbar(.hidden, for: .tabBar)
-        // もし共通の下部ボタンUIを使うなら、オーバーレイで載せる
-//        .overlay(alignment: .bottom) {
-//            BottomBar(tab: $currentTab)
-//                .padding(.bottom, 24)
-//        }
     }
 }
 
