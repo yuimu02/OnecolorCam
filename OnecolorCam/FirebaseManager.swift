@@ -83,8 +83,12 @@ enum FirebaseManager {
     }
     
     static func addFriend(uid: String, friendUid: String) async throws {
-        try await db.collection("users").document(uid).updateData([
-            "friends": FieldValue.arrayUnion([friendUid])
-        ])
+        var friends = try await db.collection("users").document(uid).getDocument().data()?["friends"] as? [String] ?? []
+        friends.append(friendUid)
+        try await db.collection("users")
+            .document(uid)
+            .setData([
+                "friends": friends
+            ])
     }
 }

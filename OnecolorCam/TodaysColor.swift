@@ -2,7 +2,7 @@
 //  TodaysColor.swift
 //  OnecolorCam
 //
-//  Created by Yuiko Muroyama on 2025/08/27.
+//  Created by Yuiko Muroyama on 2025/08/27.  made with chappy
 //
 
 import Foundation

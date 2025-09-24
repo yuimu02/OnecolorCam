@@ -35,6 +35,16 @@ struct OnecolorCamApp: App {
 //            PostView()
 //            TakePhotoView()
                 .environment(AuthManager.shared)
+                .onOpenURL { url in
+                    if let uid = AuthManager.shared.user?.uid {
+                        let userId = url.lastPathComponent
+
+                        Task {
+                            try await FirebaseManager.addFriend(uid: uid, friendUid: userId)
+                        }
+                    }
+                }
+            
         }
     }
 }

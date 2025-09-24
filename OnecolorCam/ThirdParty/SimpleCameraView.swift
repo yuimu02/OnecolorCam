@@ -2,7 +2,6 @@
 //  SimpleCameraView.swift
 //  SimpleCamera
 //
-//  Created by Yuki Kuwashima on 2024/11/09.
 //
 
 import SwiftUI

@@ -20,9 +20,22 @@
 		C1A781012DC0F9DA00D77FB3 /* OnecolorCam.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OnecolorCam.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		C1F0C4F32E83F4E100459800 /* Exceptions for "OnecolorCam" folder in "OnecolorCam" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = C1A781002DC0F9DA00D77FB3 /* OnecolorCam */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		C1A781032DC0F9DA00D77FB3 /* OnecolorCam */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				C1F0C4F32E83F4E100459800 /* Exceptions for "OnecolorCam" folder in "OnecolorCam" target */,
+			);
 			path = OnecolorCam;
 			sourceTree = "<group>";
 		};
@@ -297,6 +310,7 @@
 				DEVELOPMENT_TEAM = T3MXB7AQ8F;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = OnecolorCam/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = monoful;
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_NSCameraUsageDescription = "カメラへのアクセスを許可";
@@ -306,6 +320,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -334,6 +349,7 @@
 				DEVELOPMENT_TEAM = T3MXB7AQ8F;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = OnecolorCam/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = monoful;
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_NSCameraUsageDescription = "カメラへのアクセスを許可";
@@ -343,6 +359,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

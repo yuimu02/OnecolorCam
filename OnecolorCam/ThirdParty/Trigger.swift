@@ -2,7 +2,6 @@
 //  Trigger.swift
 //  OnecolorCam
 //
-//  Created by Yuiko Muroyama on 2025/07/30.
 //
 
 import SwiftUI

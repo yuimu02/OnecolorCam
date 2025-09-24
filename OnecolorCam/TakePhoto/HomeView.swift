@@ -5,6 +5,7 @@ import ColorfulX
 import AppleSignInFirebase
 import FirebaseFirestore
 import ColorExtensions
+import CoreImage.CIFilterBuiltins
 
 enum Tab {
     case home
@@ -40,6 +41,7 @@ struct HomeView: View {
     @State private var startIndex: Int = 0
     @State private var pagerPayload: ImagePagerPayload?
     @State private var showAlbum = false
+    @State private var isShowingQRSheet = false
     
     
     private var days: [Int?] {
@@ -126,7 +128,7 @@ struct HomeView: View {
                             //                                )
                         }
                     }
-                    .padding(.top, 45)
+                    .padding(.top, 10)
                     .padding(.bottom, 14)
                     .padding()
                     
@@ -352,21 +354,56 @@ struct HomeView: View {
             .sheet(item: $pagerPayload) { payload in
                 ImageDetailPagerSheet(posts: payload.posts, index: payload.startIndex)
             }
+            .sheet(isPresented: $isShowingQRSheet) {   // ← QRコードシート
+                            VStack {
+                                Text("MyQRコード")
+                                    .font(.headline)
+                                    .padding()
+
+                                if let uid = AuthManager.shared.user?.uid,
+                                   let uiimage = generateQR(url: "monoful-ios://user/\(uid)") {
+                                    Image(uiImage: uiimage)
+                                        .resizable()
+                                        .interpolation(.none)
+                                        .scaledToFit()
+                                        .frame(width: 250, height: 250)
+                                        .padding()
+                                        .background(Color.white)
+                                } else {
+                                    ProgressView()
+                                }
+                                Spacer()
+                                
+                                Text("カメラアプリでスキャンしてください")
+                                    .font(.headline)
+                                    .padding()
+                            }
+                            .presentationDetents([.medium, .large])
+                        }
             .refreshable {
                 Task {
                     await loadAllImagesMixed()
                 }
             }
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        isShowingQRSheet = true
+                    } label: {
+                        Image(systemName: "qrcode")
+                            .font(.system(size: 22, weight: .semibold))
+                    }
+                    .tint(.black)
+                    .padding(.top, 8)       // 上に余白
+                    .padding(.leading, 8)
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     NavigationLink {
                         // アルバムに全画像を渡して 0 枚目から表示
                         AlbumView(posts: images, index: 0)
                     } label: {
-                        HStack(spacing: 6) {
                             Image(systemName: "photo.on.rectangle.angled")
                                 .font(.system(size: 22, weight: .semibold))
-                        }
                         .padding(.top, 8)       // 上に余白
                         .padding(.trailing, 8)
                     }
@@ -398,6 +435,17 @@ struct HomeView: View {
         } catch {
             print("loadAllImagesMixed error:", error)
         }
+    }
+    func generateQR(url: String) -> UIImage? {
+        let data = url.data(using: .utf8)!
+        let qr = CIFilter.qrCodeGenerator()
+        qr.setDefaults()
+        qr.message = data
+        let sizeTransform = CGAffineTransform(scaleX: 10, y: 10)
+        guard let ciImage = qr.outputImage?.transformed(by: sizeTransform) else { return nil }
+        let context = CIContext()
+        guard let cgImage = context.createCGImage(ciImage, from: ciImage.extent) else { return nil }
+        return UIImage(cgImage: cgImage)
     }
 }
 
