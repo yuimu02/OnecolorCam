@@ -6,6 +6,7 @@ import AppleSignInFirebase
 import FirebaseFirestore
 import ColorExtensions
 import CoreImage.CIFilterBuiltins
+import UIKit
 
 enum Tab {
     case home
@@ -27,6 +28,31 @@ struct ImagePagerPayload: Identifiable {
     let startIndex: Int
 }
 
+struct HueBucket: Identifiable {
+    let id = UUID()
+    let index: Int            // 0..(bins-1)
+    let degreeCenter: Double  // 中心角（UI用）
+    let posts: [IMagepost]
+}
+
+
+private extension String {
+    var toUIColor: UIColor? {
+        var hex = trimmingCharacters(in: .whitespacesAndNewlines)
+        if hex.hasPrefix("#") { hex.removeFirst() }
+        guard hex.count == 6, let v = Int(hex, radix: 16) else { return nil }
+        let r = CGFloat((v >> 16) & 0xFF) / 255
+        let g = CGFloat((v >> 8) & 0xFF) / 255
+        let b = CGFloat(v & 0xFF) / 255
+        return UIColor(red: r, green: g, blue: b, alpha: 1)
+    }
+}
+private func hueDegree(from hex: String) -> Double? {
+    guard let ui = hex.toUIColor else { return nil }
+    var h: CGFloat = 0, s: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+    ui.getHue(&h, saturation: &s, brightness: &b, alpha: &a)
+    return Double(h * 360.0)
+}
 
 struct HomeView: View {
     let year: Int
@@ -105,7 +131,34 @@ struct HomeView: View {
         return streak
     }
     
-    
+    func buildHueBuckets(posts: [IMagepost], year: Int, month: Int, bins: Int = 36) -> [HueBucket] {
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = TimeZone(identifier: "Asia/Tokyo")!
+
+        let comps = DateComponents(year: year, month: month, day: 1)
+        guard let start = cal.date(from: comps),
+              let range = cal.range(of: .day, in: .month, for: start),
+              let end = cal.date(byAdding: .day, value: range.count, to: start) else {
+            return (0..<bins).map { HueBucket(index: $0, degreeCenter: (Double($0)+0.5)*(360.0/Double(bins)), posts: []) }
+        }
+
+        var buckets: [[IMagepost]] = Array(repeating: [], count: bins)
+        let width = 360.0 / Double(bins)
+
+        for p in posts {
+            guard (start..<end).contains(p.created),
+                  let hex = p.publiccolor,
+                  let deg = hueDegree(from: hex) else { continue }
+            let idx = min(Int(deg / width), bins - 1)
+            buckets[idx].append(p)
+        }
+
+        return (0..<bins).map { i in
+            HueBucket(index: i,
+                      degreeCenter: (Double(i) + 0.5) * width,
+                      posts: buckets[i].sorted { $0.created > $1.created })
+        }
+    }
     var body: some View {
         NavigationStack {
             ZStack {
@@ -117,8 +170,13 @@ struct HomeView: View {
                     
                     HStack(spacing: 12) {
                         Text(viewModel.formattedDate)
-                            .font(.system(size: 21))
+                            .font(.system(size: 21, weight: .medium))
                             .foregroundColor(.black)
+                            .shadow(color: .white, radius: 0, x:  0.1, y:  0)
+                            .shadow(color: .white, radius: 0, x: -0.1, y:  0)
+                            .shadow(color: .white, radius: 0, x:  0, y:  0.1)
+                            .shadow(color: .white, radius: 0, x:  0, y: -0.1)
+                            .shadow(color: .white.opacity(0.7), radius: 1)
                         if let uid = AuthManager.shared.user?.uid {
                             Circle()
                                 .fill(colorForToday(date: Date(), uid: uid))
@@ -126,7 +184,6 @@ struct HomeView: View {
                         }
                     }
                     .padding(.top, 30)
-                    .padding(.bottom, 14)
                     .padding()
                     
                     MonthPager(images: images) { posts in
@@ -136,6 +193,7 @@ struct HomeView: View {
                     HStack {
                         let oneMonthAgoPosts = findPostsOneMonthAgo()
                         let currentStreak = computeStreak()
+                        let hueBuckets = buildHueBuckets(posts: images, year: year, month: month, bins: 36)
                         
                         if let post = oneMonthAgoPosts.first,
                            let url = URL(string: post.URLString) {
@@ -157,7 +215,8 @@ struct HomeView: View {
                                 }
                             }
                             .padding(.top, 7)
-                            .padding(.trailing, 35)
+                            .padding(.leading, 20)
+                            .padding(.trailing, 20)
                         } else {
                             HStack(spacing: 10) {
                                 Image(systemName: "clock")
@@ -174,22 +233,34 @@ struct HomeView: View {
                         }
                         
                         
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("You’re on a")
-                                .font(.headline)
-                                .foregroundColor(.primary)
-                                .padding(.leading, -13)
-                            
-                            HStack(alignment: .firstTextBaseline, spacing: 6) {
-                                Text("\(currentStreak)")
-                                    .font(.system(size: 40, weight: .bold))
-                                    .monospacedDigit()
-                                
-                                Text("day run 🔥")
-                                    .font(.headline)
-                                    .foregroundColor(.primary)
+//                        VStack(alignment: .leading, spacing: 4) {
+//                            Text("You’re on a")
+//                                .font(.headline)
+//                                .foregroundColor(.primary)
+//                                .padding(.leading, -13)
+//                            
+//                            HStack(alignment: .firstTextBaseline, spacing: 6) {
+//                                Text("\(currentStreak)")
+//                                    .font(.system(size: 40, weight: .bold))
+//                                    .monospacedDigit()
+//                                
+//                                Text("day run 🔥")
+//                                    .font(.headline)
+//                                    .foregroundColor(.primary)
+//                            }
+//                        }
+                        VStack{
+                            StreakChip(count: currentStreak)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+//                                .padding(.top, 4)
+
+                            HueRingInteractive(buckets: hueBuckets, diameter: 130, ringWidth: 22) { selectedPosts in
+                                pagerPayload = .init(posts: selectedPosts, startIndex: 0)
                             }
+                            .padding(.top, -16)
+
                         }
+                        .padding(.trailing, 10)
                     }
                     
                     HStack(spacing: 34) {
@@ -424,6 +495,112 @@ struct GlassRect: View {
         RoundedRectangle(cornerRadius: 6)
             .fill(.ultraThinMaterial)
             .aspectRatio(1, contentMode: .fit)
+    }
+}
+struct StreakChip: View {
+    let count: Int
+    
+    var body: some View {
+       
+            HStack(alignment: .firstTextBaseline, spacing: 6) {
+                Text("\(count)")
+                    .font(.system(size: 30, weight: .bold))
+                    .monospacedDigit()
+                
+                Text("day streak🔥")
+                    .font(.headline)
+                    .foregroundColor(.primary)
+            }
+//        .padding(.horizontal, 12)
+//        .padding(.vertical, 6)
+    }
+}
+
+struct HueRingInteractive: View {
+    let buckets: [HueBucket]
+    var diameter: CGFloat = 200
+    var ringWidth: CGFloat = 22
+    var onSelect: (_ posts: [IMagepost]) -> Void
+
+    private var maxCount: Int { buckets.map { $0.posts.count }.max() ?? 0 }
+
+    var body: some View {
+        ZStack {
+            // 背景：色相リング
+            Circle()
+                .strokeBorder(
+                    AngularGradient(
+                        gradient: Gradient(colors: stride(from: 0.0, through: 1.0, by: 0.01)
+                            .map { Color(hue: $0, saturation: 1, brightness: 1) }),
+                        center: .center
+                    ),
+                    lineWidth: ringWidth
+                )
+                .frame(width: diameter, height: diameter)
+                .overlay(
+                    Circle().stroke(Color.black.opacity(0.10), lineWidth: 1)
+                        .frame(width: diameter, height: diameter)
+                )
+
+            // マーカー & 件数バッジ & タップ領域（ビン単位）
+            GeometryReader { geo in
+                let center = CGPoint(x: geo.size.width/2, y: geo.size.height/2)
+                let outerR = diameter/2
+                let innerR = outerR - ringWidth
+                let midR   = (outerR + innerR)/2
+                let N = buckets.count
+                let step = 2 * Double.pi / Double(N)
+
+                ForEach(buckets) { b in
+                    let count = b.posts.count
+                    let theta = (Double(b.index) + 0.5) * step
+
+                    if count > 0 {
+                        // 0..1 に正規化
+                        let t = Double(count) / Double(max(maxCount, 1))
+
+                        // 濃さ（白の不透明度）を 0.25～0.9 でマッピング
+                        let opacity = 0.25 + 0.65 * t
+
+                        let d: CGFloat = 16
+
+                        // リングの真ん中線上に配置（少し内側にしたければ midR - 8 など）
+                        let badgeR = midR
+                        let bx = center.x + CGFloat(cos(theta)) * badgeR
+                        let by = center.y + CGFloat(sin(theta)) * badgeR
+
+                        Circle()
+                            .fill(Color.white.opacity(opacity))
+                            .frame(width: d, height: d)
+                            // 色を加算気味に見せたいなら下の1行を有効化（好みで）
+                            // .blendMode(.plusLighter)
+                            .position(x: bx, y: by)
+                            .accessibilityLabel("\(count) posts")
+                    }
+
+                    // タップ領域はそのまま
+                    let start = Double(b.index) * step
+                    let end   = start + step
+                    Path { p in
+                        p.addArc(center: center, radius: midR, startAngle: .radians(start), endAngle: .radians(end), clockwise: false)
+                        p.addArc(center: center, radius: innerR, startAngle: .radians(end), endAngle: .radians(start), clockwise: true)
+                        p.closeSubpath()
+                    }
+                    .fill(Color.clear)
+                    .contentShape(Path { p in
+                        p.addArc(center: center, radius: outerR, startAngle: .radians(start), endAngle: .radians(end), clockwise: false)
+                        p.addArc(center: center, radius: innerR, startAngle: .radians(end), endAngle: .radians(start), clockwise: true)
+                        p.closeSubpath()
+                    })
+                    .onTapGesture {
+                        if !b.posts.isEmpty { onSelect(b.posts) }
+                    }
+                    .accessibilityAddTraits(.isButton)
+                }
+            }
+            .allowsHitTesting(true)
+        }
+        .frame(width: diameter + 3, height: diameter + 3)
     }
 }
 
