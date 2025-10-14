@@ -6,6 +6,8 @@
 //
 import SwiftUI
 import Foundation
+import UIKit
+import AVFoundation
 
 class HomeViewModel: ObservableObject {
     @Published var hueToDisplay: Float = 0.5
