@@ -146,6 +146,7 @@
 				C1AFB7DB2E6845AA00041053 /* XCRemoteSwiftPackageReference "RenderableView" */,
 				C1AFB8092E6AD67E00041053 /* XCRemoteSwiftPackageReference "ColorExtensions" */,
 				C1B081042E6C8F4B00CFB946 /* XCRemoteSwiftPackageReference "Kingfisher" */,
+				C11E6FB62E9F8B83002EF66A /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = C1A781022DC0F9DA00D77FB3 /* Products */;
@@ -401,6 +402,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		C11E6FB62E9F8B83002EF66A /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/facebook/facebook-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 14.1.0;
+			};
+		};
 		C13342FB2E30E1D200B2BCB4 /* XCRemoteSwiftPackageReference "ColorfulX" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Lakr233/ColorfulX.git";

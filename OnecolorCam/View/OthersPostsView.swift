@@ -10,6 +10,7 @@ import ColorfulX
 import ColorExtensions
 import AppleSignInFirebase
 import FirebaseAuth
+import Kingfisher
 
 struct OthersPostsView: View {
     @StateObject private var viewModel = HomeViewModel()
@@ -59,31 +60,18 @@ struct OthersPostsView: View {
                             ForEach(posts.indices, id: \.self) { i in
                                 VStack(spacing: 16) {
                                     if let url = URL(string: posts[i].URLString) {
-                                        AsyncImage(url: url) { phase in
-                                            switch phase {
-                                            case .empty:
+                                        KFImage(url)
+                                            .placeholder {
                                                 ProgressView()
                                                     .frame(maxWidth: .infinity, minHeight: 200)
-                                            case .success(let image):
-                                                image
-                                                    .resizable()
-                                                    .aspectRatio(contentMode: .fit)
-                                                    .frame(maxWidth: .infinity)
-                                                    .cornerRadius(21)
-                                                    .shadow(radius: 10)
-                                            case .failure:
-                                                ZStack {
-                                                    RoundedRectangle(cornerRadius: 14)
-                                                        .fill(.ultraThinMaterial)
-                                                    Image(systemName: "photo")
-                                                        .font(.system(size: 40, weight: .light))
-                                                        .foregroundColor(.secondary)
-                                                }
-                                                .frame(maxWidth: .infinity, minHeight: 200)
-                                            @unknown default:
-                                                EmptyView()
                                             }
-                                        }
+                                            .fade(duration: 0.25)
+                                            .cancelOnDisappear(true)
+                                            .resizable()
+                                            .aspectRatio(contentMode: .fit)
+                                            .frame(maxWidth: .infinity)
+                                            .cornerRadius(21)
+                                            .shadow(radius: 10)
                                     } else {
                                         ZStack {
                                             RoundedRectangle(cornerRadius: 14)
@@ -189,9 +177,19 @@ struct OthersPostsView: View {
                 print("isPublic:", item.isPublic ?? false)
             }
             
-            let sorted = items.sorted { $0.created > $1.created }
-            
-            self.posts = sorted
+                let sorted = items.sorted { $0.created > $1.created }
+
+                // 同じ id または URLString を除外
+                var seen = Set<String>()
+                let deduped = sorted.filter { post in
+                    let key = post.id ?? post.URLString
+                    return seen.insert(key).inserted
+                }
+
+                self.posts = deduped
+                self.index = 0
+                applyBackground(for: 0)
+                
             self.index = 0
             applyBackground(for: 0)
         } else {

@@ -22,54 +22,63 @@ struct PostView: View {
     @State private var updateCounter = 0
     @Environment(\.dismiss) private var dismiss
     @State private var willPostPublic = false
-    
-    
-    
+
+    // ▼ 追加：保存後のポップアップ表示・状態
+    @State private var showShareDialog = false
+    @State private var isSaving = false
+    @State private var saveError: String?
+    @State private var lastSavedPost: IMagepost? = nil
+    @State private var lastSavedUIImage: UIImage? = nil
+
     init(image: UIImage, tab: Binding<Tab>) {
         self._image = State(initialValue: image)
         self._tab = tab
     }
-    
+
     var body: some View {
         if authManager.isSignedIn {
             ZStack {
-                Color.white
-                    .ignoresSafeArea()
+                Color.white.ignoresSafeArea()
                 ColorfulView(color: $viewModel.colors)
                     .ignoresSafeArea()
                     .opacity(0.7)
+
                 VStack {
-                    
                     HStack(spacing: 12) {
                         Text(viewModel.formattedDate)
                             .font(.system(size: 20))
+                            .bold()
                             .foregroundColor(.black)
                         if let uid = AuthManager.shared.user?.uid {
                             Circle()
                                 .fill(colorForToday(date: Date(), uid: uid))
-                                .frame(width: 17, height: 17)
+                                .frame(width: 19, height: 19)
                         }
                     }
                     .padding()
-                    
-                    Button {
-                        dismiss()
-                    } label: {
-                        Label("撮り直し", systemImage: "arrow.counterclockwise")
-                            .font(.system(size: 14, weight: .semibold))
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 8)
-                            .background(.ultraThinMaterial)
-                            .clipShape(Capsule())
-                            .overlay(Capsule().stroke(Color.black.opacity(0.15), lineWidth: 0.5))
-                    }
-                    
+
                     Renderable(trigger: $updateCounter) {
                         Image(uiImage: image)
                             .resizable()
                             .scaledToFit()
                             .frame(width: 300, height: 300)
-                            .cornerRadius(20)
+                            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                            .overlay(
+                                alignment: .topTrailing
+                            ) {
+                                Button {
+                                    dismiss()
+                                } label: {
+                                    Image(systemName: "xmark")
+                                        .font(.system(size: 14, weight: .bold))
+                                        .padding(6)
+                                        .background(.ultraThinMaterial)
+                                        .clipShape(Circle())
+                                        .shadow(radius: 2)
+                                }
+                                .buttonStyle(.plain)
+                                .padding(10)
+                            }
                             .colorEffect(
                                 Shader(
                                     function: ShaderFunction(
@@ -83,31 +92,42 @@ struct PostView: View {
                                 )
                             )
                     } onTrigger: { data in
-                        self.image = UIImage(data: data!)!
-                        Task {
+                        // レンダ済み画像に差し替え
+                        if let d = data, let rendered = UIImage(data: d) {
+                            self.image = rendered
+                        }
+
+                        // ▼ 保存処理
+                        Task { @MainActor in
                             guard let uid = AuthManager.shared.user?.uid else { return }
-                            
-                            
+                            isSaving = true
+                            saveError = nil
                             do {
                                 let imageURL = try await FirebaseManager.sendImage(image: image, folderName: "folder")
-                                print("アップロード成功:", imageURL)
-                                
                                 let hex = colorForToday(date: Date(), uid: uid).hex
-                                let newPost = IMagepost(URLString: imageURL.absoluteString, publiccolor: hex, isPublic: willPostPublic)
+                                let newPost = IMagepost(
+                                    URLString: imageURL.absoluteString,
+                                    publiccolor: hex,
+                                    isPublic: willPostPublic
+                                )
                                 try FirebaseManager.addItem(item: newPost, uid: uid)
-                                
+
+                                self.lastSavedPost = newPost
+                                self.lastSavedUIImage = image        // ← ここで実際のUIImageを握る
+                                self.showShareDialog = true
                             } catch {
-                                print("アップロード失敗:", error)
+                                self.saveError = "保存に失敗: \(error.localizedDescription)"
                             }
+                            isSaving = false
                         }
                     }
-                    
+
                     HStack(spacing: 100) {
+                        // 端末保存のみ
                         Button {
                             willPostPublic = false
                             updateCounter += 1
-                            dismiss()
-                            tab = .home
+                            // ここでは遷移しない。保存→ポップアップで処理する
                         } label: {
                             Image(systemName: "arrow.down.to.line.compact")
                                 .font(.system(size: 30))
@@ -119,17 +139,15 @@ struct PostView: View {
                                         .shadow(color: .black.opacity(0.7), radius: 4, x: 0, y: 2)
                                 )
                                 .overlay(
-                                    Circle()
-                                        .stroke(Color.black, lineWidth: 0.8)
+                                    Circle().stroke(Color.black, lineWidth: 0.8)
                                 )
                         }
-                        
-                        
+
+                        // 公開ポスト
                         Button {
                             willPostPublic = true
                             updateCounter += 1
-                            dismiss()
-                            tab = .home
+                            // ここでも遷移しない。保存→ポップアップで処理する
                         } label: {
                             Image(systemName: "paperplane")
                                 .font(.system(size: 30))
@@ -141,19 +159,95 @@ struct PostView: View {
                                         .shadow(color: .black.opacity(0.7), radius: 4, x: 0, y: 2)
                                 )
                                 .overlay(
-                                    Circle()
-                                        .stroke(Color.black, lineWidth: 0.8)
+                                    Circle().stroke(Color.black, lineWidth: 0.8)
                                 )
                         }
                     }
                     .padding(.top, 40)
+
+                    if isSaving {
+                        ProgressView("保存中…")
+                            .padding(.top, 12)
+                    }
+                    if let err = saveError {
+                        Text(err).foregroundColor(.red).font(.footnote).padding(.top, 6)
+                    }
+                }
+            }
+            // ▼ 保存後のポップアップ：ストーリーズへ飛ばす
+            .confirmationDialog("保存完了。どうする？",
+                                isPresented: $showShareDialog,
+                                titleVisibility: .visible) {
+                Button("Instagramストーリーズへ") {
+                    Task { await shareToInstagram() }
+                }
+                Button("閉じる", role: .cancel) {
+                    // キャンセル時にホームへ戻す
+                    dismiss()
+                    tab = .home
                 }
             }
         } else {
             SignInWithAppleFirebaseButton()
         }
     }
-    
+
+    private func shareToInstagram() async {
+        guard let post = lastSavedPost,
+              let baseImage = lastSavedUIImage else {
+            await actuallyShare(stickerImage: image)
+            return
+        }
+
+        let sticker = renderStorySticker(
+            image: baseImage,
+            publicColorHex: post.publiccolor ?? "#000000",
+            urlString: post.URLString,
+            created: post.created
+        )
+        await actuallyShare(stickerImage: sticker)
+    }
+    func renderStorySticker(image: UIImage,
+                            publicColorHex: String,
+                            urlString: String,
+                            created: Date,
+                            scale: CGFloat = 3) -> UIImage {
+        let view = StoryStickerView(
+            image: image,
+            publicColorHex: publicColorHex,
+            urlString: urlString,
+            created: created
+        )
+        let renderer = ImageRenderer(content: view)
+        renderer.scale = scale
+        renderer.isOpaque = true
+        return renderer.uiImage ?? image
+    }
+
+    @MainActor
+    private func actuallyShare(stickerImage: UIImage) async {
+        guard let url = URL(string: "https://x.com") else { return }
+        do {
+            let outcome = try await InstagramRepository.shared.share(
+                stickerImage: stickerImage,
+                backgroundTopColor: "#FFFFFF",
+                backgroundBottomColor: "#FFFFFF",
+                contentURL: url
+            )
+            // 必要なら分岐してトーストなど表示
+            switch outcome {
+            case .openedStories:
+                print("IG Stories に直接遷移")
+            case .openedInstagramApp:
+                print("Instagramアプリを起動（Stories直行不可ケース）")
+            case .openedAppStore:
+                print("Instagram未インストール → App Storeへ誘導")
+            }
+        } catch {
+            print("share error: \(error)")
+            // ここで自前アラートなど
+        }
+    }
     
     func getTodayHue() -> Float {
         guard let uid = AuthManager.shared.user?.uid else { return 0.0 }
@@ -161,19 +255,19 @@ struct PostView: View {
         let hsv = todaysColor.toHSV()
         return hsv.h
     }
+
+    // 透明を白で埋める（StoriesのPNGで安全）
     func removeAlpha(_ image: UIImage) -> UIImage {
         let format = UIGraphicsImageRendererFormat()
         format.scale = image.scale
         format.opaque = true
-        
         let renderer = UIGraphicsImageRenderer(size: image.size, format: format)
-        return renderer.image { context in
+        return renderer.image { _ in
+            UIColor.white.setFill()
+            UIRectFill(CGRect(origin: .zero, size: image.size))
             image.draw(at: .zero)
-            context.cgContext.setFillColor(UIColor.white.cgColor)
-            context.cgContext.fill(CGRect(origin: .zero, size: image.size))
         }
-    }// UIImageのアルファチャンネルを削除するヘルパー関数
-    
+    }
 }
 
 extension Color {

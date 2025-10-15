@@ -101,7 +101,10 @@ struct TakePhotoView: View {
                         )
                         .shadow(radius: 3)
                 }
-                .padding(.top, 33)
+                .padding(.top, 18)
+                .padding(.bottom, 33)
+                
+                Spacer()
                 
                 HStack(spacing: 34) {
                     Button {
@@ -160,7 +163,9 @@ struct TakePhotoView: View {
                     }
                     .offset(y: -10)
                 }
-                .padding(.bottom, 30)
+                .padding(.bottom, 10)
+                
+                
             }
         }
         .navigationDestination(isPresented: $isShowingPostView) {

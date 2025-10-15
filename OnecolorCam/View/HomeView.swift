@@ -206,18 +206,20 @@ struct HomeView: View {
                                     .font(.headline)
                                     .foregroundColor(.white)
                                     .shadow(color: todayColor.opacity(0.9), radius: 1, x: 0, y: 0)
-                                AsyncImage(url: url) { image in
-                                    image
-                                        .resizable()
-                                        .frame(width: 140, height: 140)
-                                        .cornerRadius(12)
-                                        .shadow(radius: 4)
-                                        .onTapGesture {
-                                            pagerPayload = .init(posts: oneMonthAgoPosts, startIndex: 0)
-                                        }
-                                } placeholder: {
-                                    ProgressView()
-                                }
+                                KFImage(url)
+                                    .placeholder {
+                                        ProgressView()
+                                            .frame(width: 140, height: 140)
+                                    }
+                                    .fade(duration: 0.25) // フェードイン演出（任意）
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(width: 140, height: 140)
+                                    .cornerRadius(12)
+                                    .shadow(radius: 4)
+                                    .onTapGesture {
+                                        pagerPayload = .init(posts: oneMonthAgoPosts, startIndex: 0)
+                                    }
                             }
                             .padding(.top, 7)
                             .padding(.leading, 20)
@@ -458,16 +460,17 @@ struct ImageDetailPagerSheet: View {
                 ForEach(posts.indices, id: \.self) { i in
                     VStack(spacing: 16) {
                         if let url = URL(string: posts[i].URLString) {
-                            AsyncImage(url: url) { image in
-                                image
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(maxWidth: .infinity)
-                                    .cornerRadius(22)
-                                    .shadow(radius: 10)
-                            } placeholder: {
-                                ProgressView()
-                            }
+                            KFImage(url)
+                                .placeholder {                         
+                                    ProgressView()
+                                }
+                                .fade(duration: 0.25)
+                                .cancelOnDisappear(true)
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(maxWidth: .infinity)
+                                .cornerRadius(22)
+                                .shadow(radius: 10)
                         } else {
                             Text("画像がありません")
                         }

@@ -1,19 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-<dict>
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>CFBundleURLName</key>
-			<string>monoful-ios</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>monoful-ios</string>
-			</array>
-		</dict>
-	</array>
-</dict>
+    <dict>
+
+        <key>FacebookAppID</key>
+        <string>1121974383444617</string>
+        <key>FacebookClientToken</key>
+        <string>d726cd0f9471ca78d9ddfe9ed467ddec</string>
+        <key>FacebookDisplayName</key>
+        <string>monoful</string>
+
+        <key>LSApplicationQueriesSchemes</key>
+        <array>
+            <string>instagram-stories</string>
+            <string>instagram</string>
+        </array>
+
+        <key>CFBundleURLTypes</key>
+        <array>
+            <dict>
+                <key>CFBundleTypeRole</key>
+                <string>Editor</string>
+                <key>CFBundleURLName</key>
+                <string>monoful-ios</string>
+                <key>CFBundleURLSchemes</key>
+                <array>
+                    <string>monoful-ios</string>
+                    <string>fb1121974383444617</string>
+                </array>
+            </dict>
+        </array>
+
+
+    </dict>
 </plist>

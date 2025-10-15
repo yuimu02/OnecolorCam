@@ -7,6 +7,7 @@
 
 import SwiftUI
 import AppleSignInFirebase
+import Kingfisher
 
 struct MonthCalendarGrid: View {
     let monthDate: Date
@@ -77,20 +78,24 @@ struct MonthCalendarGrid: View {
                             let posts = findImagePosts(for: day)
                             if let first = posts.first,
                                let url = URL(string: first.URLString) {
-                                AsyncImage(url: url) { image in
-                                    ZStack(alignment: .topLeading) {
-                                        image
+                                ZStack(alignment: .topLeading) {
+                                        KFImage(url)
+                                            .placeholder {
+                                                ProgressView()
+                                            }
+                                            // スクロール大量表示でも軽く・綺麗に
+                                            .setProcessor(DownsamplingImageProcessor(size: CGSize(width: 200, height: 200)))
+                                            .cacheOriginalImage()
+                                            .cancelOnDisappear(true)
+                                            .fade(duration: 0.25)
                                             .resizable()
                                             .aspectRatio(1, contentMode: .fit)
+
                                         DateBadge(day: day)
                                     }
                                     .clipShape(RoundedRectangle(cornerRadius: 4))
+                                    .contentShape(Rectangle())
                                     .onTapGesture { onTapDayPosts(posts) }
-                                } placeholder: {
-                                    ProgressView()
-                                }
-                                .clipped()
-                                .clipShape(RoundedRectangle(cornerRadius: 4))
                             } else {
                                 Text("\(day)")
                                     .foregroundColor(.black)

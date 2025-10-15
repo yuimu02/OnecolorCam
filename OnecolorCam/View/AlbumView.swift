@@ -7,7 +7,7 @@
 
 import SwiftUI
 import ColorfulX
-
+import Kingfisher
 struct AlbumView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel = HomeViewModel()
@@ -54,13 +54,15 @@ struct AlbumView: View {
                                 pagerPayload = .init(posts: posts, startIndex: i)
                             } label: {
                                 if let url = URL(string: posts[i].URLString) {
-                                    AsyncImage(url: url) { image in
-                                        image
-                                            .resizable()
-                                            .aspectRatio(1, contentMode: .fill) // 正方形トリミング
-                                    } placeholder: {
-                                        Color.gray.opacity(0.15)
-                                    }
+                                    KFImage(url)
+                                        .placeholder {
+                                            ProgressView()
+                                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                                .background(Color.gray.opacity(0.15))
+                                        }
+                                        .resizable()
+                                        .aspectRatio(1, contentMode: .fill) // 正方形トリミング
+                                        .clipped()
                                 } else {
                                     Color.gray.opacity(0.15)
                                 }
