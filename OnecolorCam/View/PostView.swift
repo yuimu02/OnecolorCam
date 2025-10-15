@@ -270,12 +270,15 @@ struct PostView: View {
 
     @MainActor
     private func actuallyShare(stickerImage: UIImage) async {
+                if let uid = AuthManager.shared.user?.uid {
+        let todayColor = colorForToday(date: Date(), uid: uid)
         guard let url = URL(string: "https://x.com") else { return }
+        
         do {
             let outcome = try await InstagramRepository.shared.share(
                 stickerImage: stickerImage,
                 backgroundTopColor: "#FFFFFF",
-                backgroundBottomColor: "#FFFFFF",
+                backgroundBottomColor: todayColor.hex,
                 contentURL: url
             )
             // 必要なら分岐してトーストなど表示
@@ -291,6 +294,7 @@ struct PostView: View {
             print("share error: \(error)")
             // ここで自前アラートなど
         }
+    }
     }
     
     func getTodayHue() -> Float {

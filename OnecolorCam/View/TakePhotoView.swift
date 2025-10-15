@@ -212,7 +212,7 @@ struct TakePhotoView: View {
         }
         .sheet(isPresented: $isShowingQR) {
             VStack(spacing: 12) {
-                Text("My Color QR")
+                Text("友達と色を共有しよう！")
                     .font(.headline)
 
                 if let uid = AuthManager.shared.user?.uid {
@@ -233,7 +233,7 @@ struct TakePhotoView: View {
                 } else {
                     Text("サインインが必要です").foregroundColor(.secondary)
                 }
-                Text("My Color QR")
+                Text("カメラアプリで読み取ってもらおう！")
                     .font(.headline)
 
             }
