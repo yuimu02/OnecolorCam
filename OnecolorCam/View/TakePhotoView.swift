@@ -9,6 +9,10 @@ import SwiftUI
 import ColorfulX
 import AppleSignInFirebase
 
+class FriendTempColor {
+    static var friendColor: Color?
+}
+
     extension UIImage {
         func croppedToSquare() -> UIImage {
             let src = self.fixedOrientation()
@@ -88,22 +92,26 @@ struct TakePhotoView: View {
                 .padding(.horizontal, 14)
                 .padding(.top, 20)
 
-                
-                Button() {
-                    trigger.fire()
-                } label: {
-                    Circle()
-                        .fill(Color.white)
-                        .frame(width: 70, height: 70)
-                        .overlay(
+                    if let uid = AuthManager.shared.user?.uid {
+                        let hex = colorForToday(date: Date(), uid: uid).hex
+                        Spacer()
+                        Button() {
+                            trigger.fire()
+                        } label: {
                             Circle()
-                                .stroke(Color.gray.opacity(0.6), lineWidth: 4)
-                        )
-                        .shadow(radius: 3)
+                                .fill(Color.white)
+                                .frame(width: 70, height: 70)
+                                .overlay(
+                                    Circle()
+                                        .stroke(Color.gray.opacity(0.6), lineWidth: 4)
+                                )
+                                .shadow(radius: 3)
+                        }
+                        .padding(.top, 18)
+                        .padding(.bottom, 33)
+                        
                 }
-                .padding(.top, 18)
-                .padding(.bottom, 33)
-                
+
                 Spacer()
                 
                 HStack(spacing: 34) {
@@ -179,3 +187,17 @@ struct TakePhotoView: View {
     }
 }
 }
+
+//if let uid = AuthManager.shared.user?.uid,
+//   let uiimage = viewModel.generateQR(url: "monoful-ios://color/\(hex)") {
+//    Image(uiImage: uiimage)
+//        .resizable()
+//        .interpolation(.none)
+//        .scaledToFit()
+//        .frame(width: 50, height: 50)
+//        .padding()
+//        .clipShape(RoundedRectangle(cornerRadius: 12))
+//        .shadow(radius: 3)
+//} else {
+//    ProgressView()
+//}

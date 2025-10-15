@@ -53,6 +53,7 @@ inline half3 hsb2rgb(half h, half s, half v)
  float colorToDisplay,
  float range
  ) {
+    
     half3 hsb = rgb2hsb(c0.r, c0.g, c0.b);
 
     if (colorToDisplay - range < hsb.x && hsb.x < colorToDisplay + range) {

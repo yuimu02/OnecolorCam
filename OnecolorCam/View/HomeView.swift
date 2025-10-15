@@ -349,7 +349,7 @@ struct HomeView: View {
                         .padding()
                     
                     if let uid = AuthManager.shared.user?.uid,
-                       let uiimage = generateQR(url: "monoful-ios://user/\(uid)") {
+                       let uiimage = viewModel.generateQR(url: "monoful-ios://user/\(uid)") {
                         Image(uiImage: uiimage)
                             .resizable()
                             .interpolation(.none)
@@ -362,11 +362,11 @@ struct HomeView: View {
                     }
                     Spacer()
                     
-                    Text("カメラアプリでスキャンしてください")
+                    Text("お互いにカメラアプリでスキャンしてください")
                         .font(.headline)
                         .padding()
                 }
-                .presentationDetents([.medium, .large])
+                .presentationDetents([.medium])
             }
             .refreshable {
                 Task {
@@ -414,17 +414,6 @@ struct HomeView: View {
         } catch {
             print("loadAllImagesMixed error:", error)
         }
-    }
-    func generateQR(url: String) -> UIImage? {
-        let data = url.data(using: .utf8)!
-        let qr = CIFilter.qrCodeGenerator()
-        qr.setDefaults()
-        qr.message = data
-        let sizeTransform = CGAffineTransform(scaleX: 10, y: 10)
-        guard let ciImage = qr.outputImage?.transformed(by: sizeTransform) else { return nil }
-        let context = CIContext()
-        guard let cgImage = context.createCGImage(ciImage, from: ciImage.extent) else { return nil }
-        return UIImage(cgImage: cgImage)
     }
 }
 

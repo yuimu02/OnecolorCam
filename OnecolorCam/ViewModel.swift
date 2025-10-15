@@ -42,7 +42,27 @@ class HomeViewModel: ObservableObject {
     
     
     func updateColors(todaysColor: Color) {
-        colors = getNearColors(todaysColor: todaysColor)
+        if let friendColor = FriendTempColor.friendColor {
+            colors = getNearColors(todaysColor: todaysColor) + [friendColor, friendColor, friendColor]
+        } else {
+            colors = getNearColors(todaysColor: todaysColor)
+        }
+    }
+    
+    func generateQR(
+        url: String,
+//        foregroundColor: UIColor = .,
+        backgroundColor: UIColor = .white.withAlphaComponent(0.5)
+    ) -> UIImage? {
+        let data = url.data(using: .utf8)!
+        let qr = CIFilter.qrCodeGenerator()
+        qr.setDefaults()
+        qr.message = data
+        let sizeTransform = CGAffineTransform(scaleX: 10, y: 10)
+        guard let ciImage = qr.outputImage?.transformed(by: sizeTransform) else { return nil }
+        let context = CIContext()
+        guard let cgImage = context.createCGImage(ciImage, from: ciImage.extent) else { return nil }
+        return UIImage(cgImage: cgImage)
     }
     
     private func getNearColors(todaysColor: Color) -> [Color] {

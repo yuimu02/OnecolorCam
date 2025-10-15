@@ -37,19 +37,46 @@ struct OnecolorCamApp: App {
                 .toast(manager: toastManager)        // ← いつでも表示できる
                 .onOpenURL { url in
                     guard let uid = AuthManager.shared.user?.uid else { return }
-                    let userId = url.lastPathComponent
 
-                    Task {
-                        do {
-                            try await FirebaseManager.addFriend(uid: uid, friendUid: userId)
-                            await MainActor.run {
-                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                toastManager.show("友達追加完了")
-                            }
-                        } catch {
-                            await MainActor.run {
-                                UINotificationFeedbackGenerator().notificationOccurred(.error)
-                                toastManager.show("追加に失敗しました")
+                    // ★ 追加：host で分岐
+                    let host = url.host?.lowercased() ?? ""
+
+                    // ★ 追加：color 用の早期処理
+                    if host == "color" {
+                        let hex = url.lastPathComponent
+                        let normalized = hex.hasPrefix("#") ? hex : "#\(hex)"
+
+                        // ColorExtensions に Color(hex:) がある前提
+                        if let color = Color(hex: normalized) {
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            toastManager.show("カラーを読み込みました: \(normalized)")
+                            // ここで必要なら表示/状態更新を行う（例）
+                            // self.viewModel.friendColor = color
+                            // self.isShowingFriendColorSheet = true
+                            
+                            FriendTempColor.friendColor = color
+                        } else {
+                            UINotificationFeedbackGenerator().notificationOccurred(.error)
+                            toastManager.show("色コードが不正です: \(normalized)")
+                        }
+                        return
+                    } else if host == "user" {
+                        
+                        // ▼ 既存の「友達追加」(monoful-ios://user/{uid}) はそのまま
+                        let userId = url.lastPathComponent
+                        
+                        Task {
+                            do {
+                                try await FirebaseManager.addFriend(uid: uid, friendUid: userId)
+                                await MainActor.run {
+                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                    toastManager.show("友達追加完了")
+                                }
+                            } catch {
+                                await MainActor.run {
+                                    UINotificationFeedbackGenerator().notificationOccurred(.error)
+                                    toastManager.show("追加に失敗しました")
+                                }
                             }
                         }
                     }

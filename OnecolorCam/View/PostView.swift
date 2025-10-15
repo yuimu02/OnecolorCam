@@ -26,6 +26,7 @@ struct PostView: View {
     // ▼ 追加：保存後のポップアップ表示・状態
     @State private var showShareDialog = false
     @State private var isSaving = false
+    @State private var isSaveDone = false
     @State private var saveError: String?
     @State private var lastSavedPost: IMagepost? = nil
     @State private var lastSavedUIImage: UIImage? = nil
@@ -42,13 +43,21 @@ struct PostView: View {
                 ColorfulView(color: $viewModel.colors)
                     .ignoresSafeArea()
                     .opacity(0.7)
-
+                let todayColor: Color = {
+                    if let uid = AuthManager.shared.user?.uid {
+                        return colorForToday(date: Date(), uid: uid)
+                    } else {
+                        return .black
+                    }
+                }()
                 VStack {
                     HStack(spacing: 12) {
                         Text(viewModel.formattedDate)
                             .font(.system(size: 20))
                             .bold()
-                            .foregroundColor(.black)
+                            .foregroundColor(.white)
+                            .shadow(color: todayColor.opacity(0.9), radius: 1, x: 0, y: 0)
+                        
                         if let uid = AuthManager.shared.user?.uid {
                             Circle()
                                 .fill(colorForToday(date: Date(), uid: uid))
@@ -58,39 +67,46 @@ struct PostView: View {
                     .padding()
 
                     Renderable(trigger: $updateCounter) {
-                        Image(uiImage: image)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 300, height: 300)
-                            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-                            .overlay(
-                                alignment: .topTrailing
-                            ) {
-                                Button {
-                                    dismiss()
-                                } label: {
-                                    Image(systemName: "xmark")
-                                        .font(.system(size: 14, weight: .bold))
-                                        .padding(6)
-                                        .background(.ultraThinMaterial)
-                                        .clipShape(Circle())
-                                        .shadow(radius: 2)
-                                }
-                                .buttonStyle(.plain)
-                                .padding(10)
-                            }
-                            .colorEffect(
-                                Shader(
-                                    function: ShaderFunction(
-                                        library: .bundle(.main),
-                                        name: "sample"
-                                    ),
-                                    arguments: [
-                                        .float(getTodayHue()),
-                                        .float(0.1),
-                                    ]
+                        ZStack {
+                            Image(uiImage: image)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 300, height: 300)
+                                .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                                .colorEffect(
+                                    Shader(
+                                        function: ShaderFunction(
+                                            library: .bundle(.main),
+                                            name: "sample"
+                                        ),
+                                        arguments: [
+                                            .float(getTodayHue()),
+                                            .float(0.1),
+                                        ]
+                                    )
                                 )
-                            )
+                            if let friendColor = FriendTempColor.friendColor {
+                                Image(uiImage: image)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 300, height: 300)
+                                    .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                                    .colorEffect(
+                                        Shader(
+                                            function: ShaderFunction(
+                                                library: .bundle(.main),
+                                                name: "sample"
+                                            ),
+                                            arguments: [
+                                                .float(friendColor.toHSV().h),
+                                                .float(0.1),
+                                            ]
+                                        )
+                                    )
+                                    .blendMode(.overlay)
+                            }
+                        }
+                        .compositingGroup()
                     } onTrigger: { data in
                         // レンダ済み画像に差し替え
                         if let d = data, let rendered = UIImage(data: d) {
@@ -101,6 +117,7 @@ struct PostView: View {
                         Task { @MainActor in
                             guard let uid = AuthManager.shared.user?.uid else { return }
                             isSaving = true
+                            isSaveDone = false
                             saveError = nil
                             do {
                                 let imageURL = try await FirebaseManager.sendImage(image: image, folderName: "folder")
@@ -113,13 +130,34 @@ struct PostView: View {
                                 try FirebaseManager.addItem(item: newPost, uid: uid)
 
                                 self.lastSavedPost = newPost
-                                self.lastSavedUIImage = image        // ← ここで実際のUIImageを握る
-                                self.showShareDialog = true
+                                self.lastSavedUIImage = image
+                                
+                                if self.willPostPublic {
+                                    self.showShareDialog = true
+                                }
+                                
                             } catch {
                                 self.saveError = "保存に失敗: \(error.localizedDescription)"
                             }
+                            isSaveDone = true
                             isSaving = false
                         }
+                    }
+                    .overlay(
+                        alignment: .topTrailing
+                    ) {
+                        Button {
+                            dismiss()
+                        } label: {
+                            Image(systemName: "xmark")
+                                .font(.system(size: 14, weight: .bold))
+                                .padding(6)
+                                .background(.ultraThinMaterial)
+                                .clipShape(Circle())
+                                .shadow(radius: 2)
+                        }
+                        .buttonStyle(.plain)
+                        .padding(10)
                     }
 
                     HStack(spacing: 100) {
@@ -127,6 +165,9 @@ struct PostView: View {
                         Button {
                             willPostPublic = false
                             updateCounter += 1
+                            dismiss()
+                            tab = .home
+                            
                             // ここでは遷移しない。保存→ポップアップで処理する
                         } label: {
                             Image(systemName: "arrow.down.to.line.compact")
@@ -148,6 +189,9 @@ struct PostView: View {
                             willPostPublic = true
                             updateCounter += 1
                             // ここでも遷移しない。保存→ポップアップで処理する
+                            if isSaveDone {
+                                self.showShareDialog = true
+                            }
                         } label: {
                             Image(systemName: "paperplane")
                                 .font(.system(size: 30))
@@ -166,7 +210,7 @@ struct PostView: View {
                     .padding(.top, 40)
 
                     if isSaving {
-                        ProgressView("保存中…")
+                        ProgressView("投稿中…")
                             .padding(.top, 12)
                     }
                     if let err = saveError {
@@ -175,7 +219,7 @@ struct PostView: View {
                 }
             }
             // ▼ 保存後のポップアップ：ストーリーズへ飛ばす
-            .confirmationDialog("保存完了。どうする？",
+            .confirmationDialog("アプル内投稿完了。どうする？",
                                 isPresented: $showShareDialog,
                                 titleVisibility: .visible) {
                 Button("Instagramストーリーズへ") {
