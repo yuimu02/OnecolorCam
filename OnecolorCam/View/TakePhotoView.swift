@@ -50,20 +50,26 @@ struct TakePhotoView: View {
             ColorfulView(color: $viewModel.colors)
                 .ignoresSafeArea()
                 .opacity(0.7)
-            
+            let todayColor: Color = {
+                if let uid = AuthManager.shared.user?.uid {
+                    return colorForToday(date: Date(), uid: uid)
+                } else {
+                    return .black
+                }
+            }()
             VStack {
                 HStack(spacing: 12) {
                     Text(viewModel.formattedDate)
-                        .font(.system(size: 20))
-                        .foregroundColor(.black)
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundColor(.white)
+                        .shadow(color: todayColor.opacity(0.9), radius: 1, x: 0, y: 0)
                     if let uid = AuthManager.shared.user?.uid {
                         Circle()
                             .fill(colorForToday(date: Date(), uid: uid))
                             .frame(width: 17, height: 17)
                     }
                 }
-                .padding(.top, 45)
-                .padding(.bottom, 14)
+                .padding(.top, 60)
                 .padding()
                 
                 GeometryReader { geometry in
@@ -80,7 +86,7 @@ struct TakePhotoView: View {
                     .frame(maxWidth: .infinity, alignment: .center)
                 }
                 .padding(.horizontal, 14)
-                .padding(.top, 40)
+                .padding(.top, 20)
 
                 
                 Button() {
@@ -102,9 +108,9 @@ struct TakePhotoView: View {
                         tab = .home
                     } label: {
                         Image(systemName: "house")
-                            .font(.system(size: 30))
+                            .font(.system(size: 24))
                             .foregroundColor(.black)
-                            .frame(width: 80, height: 80)
+                            .frame(width: 68, height: 68)
                             .background(
                                 Circle()
                                     .fill(Color.white.opacity(0.3))
@@ -139,9 +145,9 @@ struct TakePhotoView: View {
                         tab = .others
                     } label: {
                         Image(systemName: "person.3")
-                            .font(.system(size: 25))
+                            .font(.system(size: 23))
                             .foregroundColor(.black)
-                            .frame(width: 80, height: 80)
+                            .frame(width: 68, height: 68)
                             .background(
                                 Circle()
                                     .fill(Color.white.opacity(0.3))

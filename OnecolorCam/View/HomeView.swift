@@ -7,6 +7,7 @@ import FirebaseFirestore
 import ColorExtensions
 import CoreImage.CIFilterBuiltins
 import UIKit
+import Kingfisher
 
 enum Tab {
     case home
@@ -165,18 +166,21 @@ struct HomeView: View {
                 Color.white
                 ColorfulView(color: $viewModel.colors)
                     .ignoresSafeArea()
+                let todayColor: Color = {
+                    if let uid = AuthManager.shared.user?.uid {
+                        return colorForToday(date: Date(), uid: uid)
+                    } else {
+                        return .black
+                    }
+                }()
                 
                 VStack {
                     
                     HStack(spacing: 12) {
                         Text(viewModel.formattedDate)
                             .font(.system(size: 21, weight: .medium))
-                            .foregroundColor(.black)
-                            .shadow(color: .white, radius: 0, x:  0.1, y:  0)
-                            .shadow(color: .white, radius: 0, x: -0.1, y:  0)
-                            .shadow(color: .white, radius: 0, x:  0, y:  0.1)
-                            .shadow(color: .white, radius: 0, x:  0, y: -0.1)
-                            .shadow(color: .white.opacity(0.7), radius: 1)
+                            .foregroundColor(.white)
+                            .shadow(color: todayColor.opacity(0.9), radius: 1, x: 0, y: 0)
                         if let uid = AuthManager.shared.user?.uid {
                             Circle()
                                 .fill(colorForToday(date: Date(), uid: uid))
@@ -200,7 +204,8 @@ struct HomeView: View {
                             VStack(alignment: .leading, spacing: 8) {
                                 Text("One Month Ago")
                                     .font(.headline)
-                                    .foregroundColor(.black)
+                                    .foregroundColor(.white)
+                                    .shadow(color: todayColor.opacity(0.9), radius: 1, x: 0, y: 0)
                                 AsyncImage(url: url) { image in
                                     image
                                         .resizable()
@@ -222,8 +227,9 @@ struct HomeView: View {
                                 Image(systemName: "clock")
                                 Text("1ヶ月前の今日は未投稿です")
                             }
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundColor(.white)
+                            .shadow(color: todayColor.opacity(0.9), radius: 1, x: 0, y: 0)
                             .padding()
                             .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
                             .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.black.opacity(0.06), lineWidth: 1))
@@ -267,9 +273,9 @@ struct HomeView: View {
                         Button {
                         } label: {
                             Image(systemName: "house.fill")
-                                .font(.system(size: 30))
+                                .font(.system(size: 24))
                                 .foregroundColor(.black)
-                                .frame(width: 80, height: 80)
+                                .frame(width: 68, height: 68)
                                 .background(
                                     Circle()
                                         .fill(Color.white.opacity(0.3))
@@ -305,9 +311,9 @@ struct HomeView: View {
                             tab = .others
                         } label: {
                             Image(systemName: "person.3")
-                                .font(.system(size: 25))
+                                .font(.system(size: 23))
                                 .foregroundColor(.black)
-                                .frame(width: 80, height: 80)
+                                .frame(width: 68, height: 68)
                                 .background(
                                     Circle()
                                         .fill(Color.white.opacity(0.3))
@@ -501,15 +507,25 @@ struct StreakChip: View {
     let count: Int
     
     var body: some View {
-       
+        let todayColor: Color = {
+            if let uid = AuthManager.shared.user?.uid {
+                return colorForToday(date: Date(), uid: uid)
+            } else {
+                return .black
+            }
+        }()
             HStack(alignment: .firstTextBaseline, spacing: 6) {
                 Text("\(count)")
                     .font(.system(size: 30, weight: .bold))
                     .monospacedDigit()
+                    .foregroundColor(.white)
+                    .shadow(color: todayColor.opacity(0.9), radius: 1, x: 0, y: 0)
                 
                 Text("day streak🔥")
                     .font(.headline)
-                    .foregroundColor(.primary)
+                    .foregroundColor(.white)
+                    .shadow(color: todayColor.opacity(0.9), radius: 1, x: 0, y: 0)
+                
             }
 //        .padding(.horizontal, 12)
 //        .padding(.vertical, 6)

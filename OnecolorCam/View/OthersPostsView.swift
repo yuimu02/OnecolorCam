@@ -109,9 +109,9 @@ struct OthersPostsView: View {
                 HStack(spacing: 34) {
                     Button { tab = .home } label: {
                         Image(systemName: "house")
-                            .font(.system(size: 30))
+                            .font(.system(size: 24))
                             .foregroundColor(.black)
-                            .frame(width: 80, height: 80)
+                            .frame(width: 68, height: 68)
                             .background(
                                 Circle()
                                     .fill(Color.white.opacity(0.3))
@@ -137,9 +137,9 @@ struct OthersPostsView: View {
                     
                     Button {} label: {
                         Image(systemName: "person.3.fill")
-                            .font(.system(size: 25))
+                            .font(.system(size: 23))
                             .foregroundColor(.black)
-                            .frame(width: 80, height: 80)
+                            .frame(width: 68, height: 68)
                             .background(
                                 Circle()
                                     .fill(Color.white.opacity(0.3))

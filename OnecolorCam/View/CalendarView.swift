@@ -12,6 +12,13 @@ struct MonthCalendarGrid: View {
     let monthDate: Date
     let images: [IMagepost]
     let onTapDayPosts: (_ posts: [IMagepost]) -> Void
+    let todayColor: Color = {
+        if let uid = AuthManager.shared.user?.uid {
+            return colorForToday(date: Date(), uid: uid)
+        } else {
+            return .black
+        }
+    }()
 
     private var calendar: Calendar {
         var c = Calendar(identifier: .gregorian)
@@ -54,8 +61,9 @@ struct MonthCalendarGrid: View {
                 ForEach(weekDays, id: \.self) { day in
                     Text(day)
                         .font(.system(size: 14, weight: .bold))
-                        .foregroundColor(.black)
+                        .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
+                        .shadow(color: todayColor.opacity(0.9), radius: 1, x: 0, y: 0)
                 }
             }
 
@@ -90,6 +98,10 @@ struct MonthCalendarGrid: View {
                             }
                         }
                     }
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 6)
+                            .stroke(todayColor.opacity(0.3), lineWidth: 1.2)
+                    )
                     .padding(.vertical, 3)
                 }
             }
@@ -100,6 +112,13 @@ struct MonthCalendarGrid: View {
 struct MonthPager: View {
     let images: [IMagepost]
     let onTapDayPosts: (_ posts: [IMagepost]) -> Void
+    let todayColor: Color = {
+        if let uid = AuthManager.shared.user?.uid {
+            return colorForToday(date: Date(), uid: uid)
+        } else {
+            return .black
+        }
+    }()
 
     private let calendar = Calendar(identifier: .gregorian)
     private let months: [Date]
@@ -137,7 +156,8 @@ struct MonthPager: View {
             HStack(spacing: 20) {
                 Text(title(for: months[index]))
                     .font(.system(size: 16, weight: .bold))
-                    .foregroundColor(.black)
+                    .foregroundColor(.white)
+                    .shadow(color: todayColor.opacity(0.9), radius: 1, x: 0, y: 0)
             }
 
             TabView(selection: $index) {
