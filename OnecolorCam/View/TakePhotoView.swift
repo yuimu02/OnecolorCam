@@ -45,6 +45,7 @@ struct TakePhotoView: View {
     @State private var capturedImage: UIImage? = nil
     @State private var isShowingPostView = false
     @Binding var tab: Tab
+    @State private var isShowingQR = false
     
     var body: some View {
         NavigationStack {
@@ -184,6 +185,63 @@ struct TakePhotoView: View {
                 EmptyView()
             }
         }
+        .overlay(alignment: .bottomTrailing) {
+            let todayColor: Color = {
+                if let uid = AuthManager.shared.user?.uid {
+                    return colorForToday(date: Date(), uid: uid)
+                } else {
+                    return .black
+                }
+            }()
+            Button {
+                isShowingQR = true
+            } label: {
+                Image(systemName: "qrcode")
+                    .font(.system(size: 28, weight: .semibold))
+                    .foregroundColor(.white)
+                    .frame(width: 44, height: 44)
+//                    .background(.ultraThinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+//                    .shadow(radius: 3)
+                    .shadow(color: todayColor.opacity(1), radius: 1, x: 0, y: 0)
+                    .shadow(color: todayColor.opacity(1), radius: 2, x: 0, y: 0)
+                    .shadow(color: todayColor.opacity(1), radius: 2, x: 0, y: 0)
+            }
+            .padding(.trailing, 36)
+            .padding(.bottom, 182) // 撮影ボタンより少し上に見えるよう微調整
+        }
+        .sheet(isPresented: $isShowingQR) {
+            VStack(spacing: 12) {
+                Text("My Color QR")
+                    .font(.headline)
+
+                if let uid = AuthManager.shared.user?.uid {
+                    let hex = colorForToday(date: Date(), uid: uid)
+                        .hex.replacingOccurrences(of: "#", with: "")
+                    if let uiimage = viewModel.generateQR(url: "monoful-ios://color/\(hex)") {
+                        Image(uiImage: uiimage)
+                            .resizable().interpolation(.none).scaledToFit()
+                            .frame(width: 200, height: 200)
+                            .padding()
+                            .background(Color.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .shadow(radius: 3)
+                    } else {
+                        ProgressView()
+                            .frame(height: 200)
+                    }
+                } else {
+                    Text("サインインが必要です").foregroundColor(.secondary)
+                }
+                Text("My Color QR")
+                    .font(.headline)
+
+            }
+            .padding()
+            .presentationDetents([.height(300)])          // 伸びない固定サイズ
+            .presentationDragIndicator(.hidden)           // つまみ非表示（任意）
+        }
+
     }
 }
 }
