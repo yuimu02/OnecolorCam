@@ -64,7 +64,6 @@ enum FirebaseManager {
         let friends = userDoc.data()?["friends"] as? [String] ?? []
         if friends.isEmpty { return [] }
 
-        // 2) 並列で各友だちの posts を取得
         var all: [IMagepost] = []
         try await withThrowingTaskGroup(of: [IMagepost].self) { group in
             for friendUid in friends {
