@@ -33,11 +33,7 @@ enum FirebaseManager {
 
     static func addItem(item: IMagepost, uid: String) throws {
         print(uid)
-//        if isPublic == false{
             try db.collection("users").document(uid).collection("posts").addDocument(from: item)
-//        } else {
-//            try db.collection("publicPhotos").addDocument(from: item)
-//        }
     }
 
     static func deleteItem(id: String, uid: String) throws {

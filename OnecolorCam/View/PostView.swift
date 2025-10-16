@@ -168,7 +168,6 @@ struct PostView: View {
                             dismiss()
                             tab = .home
                             
-                            // ここでは遷移しない。保存→ポップアップで処理する
                         } label: {
                             Image(systemName: "arrow.down.to.line.compact")
                                 .font(.system(size: 30))
@@ -188,7 +187,7 @@ struct PostView: View {
                         Button {
                             willPostPublic = true
                             updateCounter += 1
-                            // ここでも遷移しない。保存→ポップアップで処理する
+                            
                             if isSaveDone {
                                 self.showShareDialog = true
                             }

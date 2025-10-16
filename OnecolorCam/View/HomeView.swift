@@ -241,26 +241,9 @@ struct HomeView: View {
                         }
                         
                         
-//                        VStack(alignment: .leading, spacing: 4) {
-//                            Text("You’re on a")
-//                                .font(.headline)
-//                                .foregroundColor(.primary)
-//                                .padding(.leading, -13)
-//                            
-//                            HStack(alignment: .firstTextBaseline, spacing: 6) {
-//                                Text("\(currentStreak)")
-//                                    .font(.system(size: 40, weight: .bold))
-//                                    .monospacedDigit()
-//                                
-//                                Text("day run 🔥")
-//                                    .font(.headline)
-//                                    .foregroundColor(.primary)
-//                            }
-//                        }
                         VStack{
                             StreakChip(count: currentStreak)
                                 .frame(maxWidth: .infinity, alignment: .leading)
-//                                .padding(.top, 4)
 
                             HueRingInteractive(buckets: hueBuckets, diameter: 130, ringWidth: 22) { selectedPosts in
                                 pagerPayload = .init(posts: selectedPosts, startIndex: 0)
@@ -490,6 +473,7 @@ struct ImageDetailPagerSheet: View {
             .tabViewStyle(.page)
             .indexViewStyle(.page(backgroundDisplayMode: .interactive))
         }
+        .presentationBackground(.ultraThinMaterial)
     }
 }
 
@@ -524,8 +508,6 @@ struct StreakChip: View {
                     .shadow(color: todayColor.opacity(0.9), radius: 1, x: 0, y: 0)
                 
             }
-//        .padding(.horizontal, 12)
-//        .padding(.vertical, 6)
     }
 }
 
@@ -563,7 +545,6 @@ struct HueRingInteractive: View {
                         .frame(width: diameter, height: diameter)
                 )
 
-            // マーカー & 件数バッジ & タップ領域（ビン単位）
             GeometryReader { geo in
                 let center = CGPoint(x: geo.size.width/2, y: geo.size.height/2)
                 let outerR = diameter/2
@@ -599,7 +580,6 @@ struct HueRingInteractive: View {
                             .accessibilityLabel("\(count) posts")
                     }
 
-                    // タップ領域はそのまま
                     let start = Double(b.index) * step
                     let end   = start + step
                     Path { p in
@@ -625,6 +605,4 @@ struct HueRingInteractive: View {
     }
 }
 
-//#Preview {
-//    HomeView(year: 2025, month: 8)
-//}
+

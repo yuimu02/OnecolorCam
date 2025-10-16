@@ -147,7 +147,7 @@ struct OthersPostsView: View {
         .onAppear {
             posts = []
             index = 0
-            applyBackground(for: 0) // 初期反映
+            applyBackground(for: 0)
             Task { await loadPublic() }
         }
         .refreshable {
@@ -168,16 +168,6 @@ struct OthersPostsView: View {
             if let uid = AuthManager.shared.user?.uid {
             let items = try await FirebaseManager.getAllPublicItems(for: uid)
             
-            // デバッグ出力
-            print("取得件数:", items.count)
-            for (i, item) in items.enumerated() {
-                print("---- \(i) ----")
-                print("id:", item.id ?? "nil")
-                print("created:", item.created)
-                print("URLString:", item.URLString)
-                print("publiccolor:", item.publiccolor ?? "nil")
-                print("isPublic:", item.isPublic ?? false)
-            }
             
                 let sorted = items.sorted { $0.created > $1.created }
 

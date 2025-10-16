@@ -51,8 +51,7 @@ class HomeViewModel: ObservableObject {
     
     func generateQR(
         url: String,
-//        foregroundColor: UIColor = UIColor(white: 0.3, alpha: 1.0),
-//        backgroundColor: UIColor = .clear
+
     ) -> UIImage? {
         
         let data = url.data(using: .utf8)!

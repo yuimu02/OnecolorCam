@@ -55,6 +55,16 @@ inline half3 hsb2rgb(half h, half s, half v)
  ) {
     
     half3 hsb = rgb2hsb(c0.r, c0.g, c0.b);
+//
+//    if (hsb.x < 0.0h || hsb.x > 1.0h) {
+//        hsb.x = 0.0h;
+//    }
+//    if (hsb.y < 0.0h || hsb.y > 1.0h) {
+//        hsb.y = 0.0h;
+//    }
+//    if (hsb.z < 0.0h || hsb.z > 1.0h) {
+//        hsb.z = 0.0h;
+//    }
 
     if (colorToDisplay - range < hsb.x && hsb.x < colorToDisplay + range) {
 

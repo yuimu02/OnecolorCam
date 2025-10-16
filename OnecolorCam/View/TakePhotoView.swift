@@ -208,7 +208,7 @@ struct TakePhotoView: View {
                     .shadow(color: todayColor.opacity(1), radius: 2, x: 0, y: 0)
             }
             .padding(.trailing, 36)
-            .padding(.bottom, 182) // 撮影ボタンより少し上に見えるよう微調整
+            .padding(.bottom, 182)
         }
         .sheet(isPresented: $isShowingQR) {
             VStack(spacing: 12) {
@@ -238,8 +238,8 @@ struct TakePhotoView: View {
 
             }
             .padding()
-            .presentationDetents([.height(370)])          // 伸びない固定サイズ
-            .presentationDragIndicator(.hidden)           // つまみ非表示（任意）
+            .presentationDetents([.height(370)])
+            .presentationDragIndicator(.hidden)
             .presentationBackground(.ultraThinMaterial)
         }
 
@@ -247,16 +247,3 @@ struct TakePhotoView: View {
 }
 }
 
-//if let uid = AuthManager.shared.user?.uid,
-//   let uiimage = viewModel.generateQR(url: "monoful-ios://color/\(hex)") {
-//    Image(uiImage: uiimage)
-//        .resizable()
-//        .interpolation(.none)
-//        .scaledToFit()
-//        .frame(width: 50, height: 50)
-//        .padding()
-//        .clipShape(RoundedRectangle(cornerRadius: 12))
-//        .shadow(radius: 3)
-//} else {
-//    ProgressView()
-//}
