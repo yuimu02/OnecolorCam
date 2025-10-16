@@ -17,7 +17,6 @@ final class NotificationService: NSObject, UNUserNotificationCenterDelegate {
     static let shared = NotificationService()
     private override init() {}
 
-    // 起動時に呼ぶ
     func configure() {
         let center = UNUserNotificationCenter.current()
         center.delegate = self
@@ -29,7 +28,6 @@ final class NotificationService: NSObject, UNUserNotificationCenterDelegate {
         }
     }
 
-    // 毎朝10:00通知を登録（重複しないよう同じIDで上書き）
     func scheduleDaily10AM() {
         let center = UNUserNotificationCenter.current()
         center.removePendingNotificationRequests(withIdentifiers: [LocalNotifyID.daily10])
@@ -51,7 +49,6 @@ final class NotificationService: NSObject, UNUserNotificationCenterDelegate {
         }
     }
 
-    // フォアグラウンドでもバナーを出したい場合
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 willPresent notification: UNNotification,
                                 withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {

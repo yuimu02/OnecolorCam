@@ -51,9 +51,10 @@ class HomeViewModel: ObservableObject {
     
     func generateQR(
         url: String,
-//        foregroundColor: UIColor = .,
-        backgroundColor: UIColor = .white.withAlphaComponent(0.5)
+//        foregroundColor: UIColor = UIColor(white: 0.3, alpha: 1.0),
+//        backgroundColor: UIColor = .clear
     ) -> UIImage? {
+        
         let data = url.data(using: .utf8)!
         let qr = CIFilter.qrCodeGenerator()
         qr.setDefaults()

@@ -276,7 +276,7 @@ struct HomeView: View {
                         } label: {
                             Image(systemName: "house.fill")
                                 .font(.system(size: 24))
-                                .foregroundColor(.black)
+                                .foregroundColor(Color(white: 0.26))
                                 .frame(width: 68, height: 68)
                                 .background(
                                     Circle()
@@ -285,7 +285,7 @@ struct HomeView: View {
                                 )
                                 .overlay(
                                     Circle()
-                                        .stroke(Color.black, lineWidth: 1.7)
+                                        .stroke(Color(white: 0.26), lineWidth: 1.7)
                                 )
                         }
                         .offset(y: -10)
@@ -295,7 +295,7 @@ struct HomeView: View {
                         } label: {
                             Image(systemName: "camera")
                                 .font(.system(size: 30))
-                                .foregroundColor(.black)
+                                .foregroundColor(Color(white: 0.26))
                                 .frame(width: 80, height: 80)
                                 .background(
                                     Circle()
@@ -304,7 +304,7 @@ struct HomeView: View {
                                 )
                                 .overlay(
                                     Circle()
-                                        .stroke(Color.black, lineWidth: 0.8)
+                                        .stroke(Color(white: 0.26), lineWidth: 0.8)
                                 )
                         }
                         .offset(y: 10)
@@ -314,7 +314,7 @@ struct HomeView: View {
                         } label: {
                             Image(systemName: "person.3")
                                 .font(.system(size: 23))
-                                .foregroundColor(.black)
+                                .foregroundColor(Color(white: 0.26))
                                 .frame(width: 68, height: 68)
                                 .background(
                                     Circle()
@@ -323,7 +323,7 @@ struct HomeView: View {
                                 )
                                 .overlay(
                                     Circle()
-                                        .stroke(Color.black, lineWidth: 0.8)
+                                        .stroke(Color(white: 0.26), lineWidth: 0.8)
                                 )
                         }
                         .offset(y: -10)
@@ -346,17 +346,19 @@ struct HomeView: View {
                 VStack {
                     Text("MyQRコード")
                         .font(.headline)
-                        .padding()
-                    
+                        .padding(.top, 14)
+                        .padding(.bottom, 13)
+                    Spacer()
                     if let uid = AuthManager.shared.user?.uid,
                        let uiimage = viewModel.generateQR(url: "monoful-ios://user/\(uid)") {
                         Image(uiImage: uiimage)
                             .resizable()
                             .interpolation(.none)
                             .scaledToFit()
-                            .frame(width: 250, height: 250)
+                            .frame(width: 220, height: 220)
                             .padding()
                             .background(Color.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
                     } else {
                         ProgressView()
                     }
@@ -367,7 +369,10 @@ struct HomeView: View {
                         .padding()
                 }
                 .presentationDetents([.medium])
+                .presentationBackground(.ultraThinMaterial)
             }
+            
+            
             .refreshable {
                 Task {
                     await loadAllImagesMixed()
@@ -381,7 +386,7 @@ struct HomeView: View {
                         Image(systemName: "qrcode")
                             .font(.system(size: 22, weight: .semibold))
                     }
-                    .tint(.black)
+                    .tint(Color(white: 0.26))
                     .padding(.top, 8)
                     .padding(.leading, 8)
                 }
@@ -394,7 +399,7 @@ struct HomeView: View {
                             .padding(.top, 8)
                             .padding(.trailing, 8)
                     }
-                    .tint(.black)
+                    .tint(Color(white: 0.26))
                     .disabled(images.isEmpty)
                 }
             }
@@ -534,6 +539,14 @@ struct HueRingInteractive: View {
 
     var body: some View {
         ZStack {
+            Circle()
+                .stroke(Color.white.opacity(0.6), lineWidth: 3)
+                .frame(width: diameter + 3, height: diameter + 3)
+
+            // 白い縁（内側）
+            Circle()
+                .stroke(Color.white.opacity(0.6), lineWidth: 3)
+                .frame(width: diameter - ringWidth, height: diameter - ringWidth)
             // 背景：色相リング
             Circle()
                 .strokeBorder(

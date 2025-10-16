@@ -38,9 +38,9 @@ struct ToastViewModifier: ViewModifier {
                 VStack {
                     Spacer()
                     Text(message)
-                        .font(.system(size: 18, weight: .bold)) // ← 少し大きめ
+                        .font(.system(size: 18, weight: .bold))
                         .foregroundColor(.primary)
-                        .padding(.horizontal, 24)              // ← 横幅広く
+                        .padding(.horizontal, 24)      
                         .padding(.vertical, 16)
                         .background(.ultraThinMaterial)
                         .clipShape(RoundedRectangle(cornerRadius: 14))

@@ -53,6 +53,7 @@ struct OthersPostsView: View {
                 if posts.isEmpty {
                     Text(emptyMessage)
                         .font(.headline)
+                        .foregroundColor(Color(white: 0.26)) 
                         .padding(.top, 24)
                 } else {
                     VStack(spacing: 16) {
@@ -98,42 +99,42 @@ struct OthersPostsView: View {
                     Button { tab = .home } label: {
                         Image(systemName: "house")
                             .font(.system(size: 24))
-                            .foregroundColor(.black)
+                            .foregroundColor(Color(white: 0.26))
                             .frame(width: 68, height: 68)
                             .background(
                                 Circle()
                                     .fill(Color.white.opacity(0.3))
                                     .shadow(color: .black.opacity(0.7), radius: 4, x: 0, y: 2)
                             )
-                            .overlay(Circle().stroke(Color.black, lineWidth: 0.8))
+                            .overlay(Circle().stroke(Color(white: 0.26), lineWidth: 0.8))
                     }
                     .offset(y: -10)
                     
                     Button { tab = .camera } label: {
                         Image(systemName: "camera")
                             .font(.system(size: 30))
-                            .foregroundColor(.black)
+                            .foregroundColor(Color(white: 0.26))
                             .frame(width: 80, height: 80)
                             .background(
                                 Circle()
                                     .fill(Color.white.opacity(0.3))
                                     .shadow(color: .black.opacity(0.7), radius: 4, x: 0, y: 2)
                             )
-                            .overlay(Circle().stroke(Color.black, lineWidth: 0.8))
+                            .overlay(Circle().stroke(Color(white: 0.26), lineWidth: 0.8))
                     }
                     .offset(y: 10)
                     
                     Button {} label: {
                         Image(systemName: "person.3.fill")
                             .font(.system(size: 23))
-                            .foregroundColor(.black)
+                            .foregroundColor(Color(white: 0.26))
                             .frame(width: 68, height: 68)
                             .background(
                                 Circle()
                                     .fill(Color.white.opacity(0.3))
                                     .shadow(color: .black.opacity(0.7), radius: 4, x: 0, y: 2)
                             )
-                            .overlay(Circle().stroke(Color.black, lineWidth: 1.7))
+                            .overlay(Circle().stroke(Color(white: 0.26), lineWidth: 1.7))
                     }
                     .offset(y: -10)
                 }

@@ -121,7 +121,7 @@ struct TakePhotoView: View {
                     } label: {
                         Image(systemName: "house")
                             .font(.system(size: 24))
-                            .foregroundColor(.black)
+                            .foregroundColor(Color(white: 0.26))
                             .frame(width: 68, height: 68)
                             .background(
                                 Circle()
@@ -130,7 +130,7 @@ struct TakePhotoView: View {
                             )
                             .overlay(
                                 Circle()
-                                    .stroke(Color.black, lineWidth: 0.8)
+                                    .stroke(Color(white: 0.26), lineWidth: 0.8)
                             )
                     }
                     .offset(y: -10)
@@ -139,7 +139,7 @@ struct TakePhotoView: View {
                     } label: {
                         Image(systemName: "camera.fill")
                             .font(.system(size: 30))
-                            .foregroundColor(.black)
+                            .foregroundColor(Color(white: 0.26))
                             .frame(width: 80, height: 80)
                             .background(
                                 Circle()
@@ -148,7 +148,7 @@ struct TakePhotoView: View {
                             )
                             .overlay(
                                 Circle()
-                                    .stroke(Color.black, lineWidth: 1.7)
+                                    .stroke(Color(white: 0.26), lineWidth: 1.7)
                             )
                     }
                     .offset(y: 10)
@@ -158,7 +158,7 @@ struct TakePhotoView: View {
                     } label: {
                         Image(systemName: "person.3")
                             .font(.system(size: 23))
-                            .foregroundColor(.black)
+                            .foregroundColor(Color(white: 0.26))
                             .frame(width: 68, height: 68)
                             .background(
                                 Circle()
@@ -167,7 +167,7 @@ struct TakePhotoView: View {
                             )
                             .overlay(
                                 Circle()
-                                    .stroke(Color.black, lineWidth: 0.8)
+                                    .stroke(Color(white: 0.26), lineWidth: 0.8)
                             )
                     }
                     .offset(y: -10)
@@ -238,8 +238,9 @@ struct TakePhotoView: View {
 
             }
             .padding()
-            .presentationDetents([.height(300)])          // 伸びない固定サイズ
+            .presentationDetents([.height(370)])          // 伸びない固定サイズ
             .presentationDragIndicator(.hidden)           // つまみ非表示（任意）
+            .presentationBackground(.ultraThinMaterial)
         }
 
     }

@@ -172,7 +172,7 @@ struct PostView: View {
                         } label: {
                             Image(systemName: "arrow.down.to.line.compact")
                                 .font(.system(size: 30))
-                                .foregroundColor(.black)
+                                .foregroundColor(Color(white: 0.26))
                                 .frame(width: 60, height: 60)
                                 .background(
                                     Circle()
@@ -195,7 +195,7 @@ struct PostView: View {
                         } label: {
                             Image(systemName: "paperplane")
                                 .font(.system(size: 30))
-                                .foregroundColor(.black)
+                                .foregroundColor(Color(white: 0.26))
                                 .frame(width: 60, height: 60)
                                 .background(
                                     Circle()
@@ -224,6 +224,8 @@ struct PostView: View {
                                 titleVisibility: .visible) {
                 Button("Instagramストーリーズへ") {
                     Task { await shareToInstagram() }
+                    dismiss()
+                    tab = .home
                 }
                 Button("閉じる", role: .cancel) {
                     // キャンセル時にホームへ戻す
@@ -278,7 +280,7 @@ struct PostView: View {
             let outcome = try await InstagramRepository.shared.share(
                 stickerImage: stickerImage,
                 backgroundTopColor: "#FFFFFF",
-                backgroundBottomColor: todayColor.hex,
+                backgroundBottomColor: "#\(todayColor.hex)",
                 contentURL: url
             )
             // 必要なら分岐してトーストなど表示

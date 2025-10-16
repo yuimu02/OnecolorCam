@@ -99,7 +99,7 @@ struct MonthCalendarGrid: View {
                                     .onTapGesture { onTapDayPosts(posts) }
                             } else {
                                 Text("\(day)")
-                                    .foregroundColor(.black)
+                                    .foregroundColor(Color(white: 0.26))
                                     .font(.system(size: 14, weight: .bold))
                             }
                         }

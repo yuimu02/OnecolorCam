@@ -9,30 +9,29 @@ struct StoryStickerView: View {
     let created: Date
 
     var body: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: 20) {
             Image(uiImage: image)
                 .resizable()
                 .aspectRatio(contentMode: .fill)
                 .frame(width: 260, height: 260)
-                .clipped()
-                .cornerRadius(16)
+                .clipShape(Rectangle())
 
                 HStack(spacing: 8) {
                     Text(created.formatted(date: .numeric, time: .omitted))
-                        .font(.system(size: 12, weight: .regular, design: .monospaced))
+                        .font(.system(size: 20, weight: .regular, design: .monospaced))
                         .lineLimit(1)
                     Circle()
                         .fill(Color(hex: publicColorHex) ?? .black)
-                        .frame(width: 14, height: 14)
+                        .frame(width: 20, height: 20)
                 }
             .frame(maxWidth: .infinity, alignment: .center)
             .padding(.horizontal, 12)
-            .padding(.bottom, 12)
+            .padding(.top, 20)
+            .padding(.bottom, 30)
         }
-        .frame(width: 300, height: 360)
+        .frame(width: 300, height: 400)
         .padding(14)
         .background(Color.white)
-        .cornerRadius(20)
         .shadow(color: .black.opacity(0.12), radius: 10, x: 0, y: 6)
     }
 }
