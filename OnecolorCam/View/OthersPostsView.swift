@@ -51,10 +51,10 @@ struct OthersPostsView: View {
                     Task { await loadPublic() }
                 }
                 if posts.isEmpty {
+                    Spacer()
                     Text(emptyMessage)
                         .font(.headline)
-                        .foregroundColor(Color(white: 0.26)) 
-                        .padding(.top, 24)
+                        .foregroundColor(Color(white: 0.26))
                 } else {
                     VStack(spacing: 16) {
                         TabView(selection: $index) {
@@ -94,6 +94,7 @@ struct OthersPostsView: View {
                         }
                     }
                 }
+                Spacer()
                 // Bottom nav
                 HStack(spacing: 34) {
                     Button { tab = .home } label: {
@@ -138,7 +139,7 @@ struct OthersPostsView: View {
                     }
                     .offset(y: -10)
                 }
-                .padding()
+
                 
             }
             .padding()

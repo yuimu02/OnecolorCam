@@ -172,7 +172,7 @@ struct TakePhotoView: View {
                     }
                     .offset(y: -10)
                 }
-                .padding(.bottom, 10)
+                .padding(.bottom, 18)
                 
                 
             }
