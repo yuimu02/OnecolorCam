@@ -18,7 +18,7 @@ extension String: @retroactive LocalizedError {
 enum FirebaseManager {
 
     private static let db = Firestore.firestore()
-    private static let storage = Storage.storage().reference()
+    private static let storage = Storage.storage(url: "gs://onecolorcam").reference()
 
     static func sendImage(image: UIImage, folderName: String) async throws -> URL {
         guard let imageData = image.jpegData(compressionQuality: 1) else {
